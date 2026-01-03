@@ -5,20 +5,17 @@
                 <img :src="logo">
             </div>
             <el-menu
-                default-active="2"
+                :default-active="menuactive"
                 background-color="#545c64"
                 text-color="#fff"
                 class="el-menu-vertical"
                 :collapse="true">
 
-                <el-menu-item index="2">
-                <el-icon><icon-menu /></el-icon>
-                <template #title>Navigator Two</template>
+                <el-menu-item v-for="menu in appStore.leftTopMenu" :key="menu.key" :index="menu.key" @click="()=>menuClick(menu)">
+                    <svg-icon  :icon-class="menu.icon" />
+                    <template #title>{{ menu.title }}</template>
                 </el-menu-item>
-                <el-menu-item index="3" >
-                <el-icon><document /></el-icon>
-                <template #title>Navigator Three</template>
-                </el-menu-item>
+   
                 <el-menu-item index="99" class="menu-setting">
                     <el-icon><setting /></el-icon>
                     <template #title>设置</template>
@@ -29,20 +26,30 @@
                 </el-menu-item>
             </el-menu>
         </el-aside>
-        <el-main>
-            
+        <el-main v-show="appStore.selectLeftMenu?.subPanel" class="subpanel">
+            <div class="sub-title">
+                <el-text class="sub-title-text" tag="b" size="large">{{ appStore.selectLeftMenu?.title }}</el-text>
+            </div>
+            <div id="layout-leftmenu-subpanel"></div>
         </el-main>
     </el-container>
 </template>
 
 <script setup lang="ts">
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from '@element-plus/icons-vue'
+import { ref,computed, getCurrentInstance } from 'vue'
 import logo from '@/assets/logo.png'
+import { useAppStore } from '@/store/modules/app'
+
+const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const appStore = useAppStore()
+
+
+const menuactive = computed(() => appStore.selectLeftMenu?.key);
+
+const menuClick = (menu: ILeftMenu) => {
+    appStore.selectLeftMenu = menu
+    proxy?.$EventBus.emit('leftmenu-click', menu);
+}
 
 </script>
 
@@ -71,6 +78,21 @@ import logo from '@/assets/logo.png'
 }
 .el-menu{
     border-right: none;
+}
+.subpanel{
+    padding: 10px;
+    overflow: hidden;
+}
+.sub-title{
+    height: 50px;
+    // position: relative;
+    display: flex;
+    -webkit-app-region: drag;
+    .sub-title-text{
+    //    position: absolute;
+    //    bottom: 0;
+    }
+
 }
 .menu-setting{
     position: absolute;
