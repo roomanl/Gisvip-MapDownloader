@@ -17,9 +17,10 @@
     import { layerList } from '@/maplib/LayerList';
     import {mapManager} from '@/maplib/MapManager';
     import { getTdtKey } from '@/utils/settingStore'
-
+    import { useDownConfStore } from '@/store/modules/downConf'
 
     const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+    const downConfStore = useDownConfStore();
     const props = {
         label: 'label',
     }
@@ -42,6 +43,7 @@
             }
         }
         mapManager.loadBaseMap(data);
+        downConfStore.downLayer = {layer:data,parent:node.parent.data};
         proxy?.$EventBus.emit('switch-map', {layer:data,parent:node.parent.data});
     }
 
