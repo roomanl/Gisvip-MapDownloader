@@ -1,11 +1,14 @@
 <template>
     <div>
-        <el-form  label-width="auto" label-position="top">
+        <el-form size="large"  label-width="auto" label-position="top">
             <el-form-item label="天地图key">
-                <el-input v-model="form.tdtKey"  :rows="2" type="textarea" resize="none"></el-input>
+                <el-input v-model="form.tdtKey" ></el-input>
             </el-form-item>
+             <el-form-item>
+                <el-button type="info" plain  @click="saveSetting" >保 存</el-button>
+             </el-form-item>
         </el-form>
-        <el-button  size="small" round style="width:100%" @click="saveSetting" >保 存</el-button>
+        
     </div>
 </template>
 

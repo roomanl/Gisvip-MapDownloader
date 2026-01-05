@@ -3,18 +3,20 @@ import { ref,computed } from 'vue';
 
 export const useDownConfStore = defineStore('downConf-store', () => {
   
-    const downloadExtent = ref([])
-    const downloadZoom = ref([5,10])
-    const tilesType = ref('jpg')
-    const downloadPath = ref('')
+    const downExtent = ref([])
+    const downZoom = ref([5,10])
+    const downTilesType = ref('jpg')
+    const downPath = ref('')
+    const downCoordinates = ref([])
     const downLayer = undefined
     const downArea = undefined
   
     return {
-        downloadExtent,
-        downloadZoom,
-        tilesType,
-        downloadPath,
+        downExtent,
+        downZoom,
+        downTilesType,
+        downPath,
+        downCoordinates,
         downLayer,
         downArea
     };

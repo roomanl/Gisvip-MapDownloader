@@ -3,6 +3,7 @@ interface ILeftMenu {
     icon: string;
     key: string;
     type: string;
+    router: string;
     subPanel?: Boolean;
     callback?: Function;
 }

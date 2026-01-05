@@ -8,19 +8,19 @@ export default class DownloadMapManager {
     }
 
     async checkDownConf() { 
-        if(!this.downConfStore.downloadExtent || this.downConfStore.downloadExtent.length !=4){
-            this.notification('请选择下载范围')
+        if(!this.downConfStore.downExtent || this.downConfStore.downExtent.length !=4){
+            this.notification('请选择下载区域')
             return false
         }
-        if(!this.downConfStore.downloadPath){ 
+        if(!this.downConfStore.downPath){ 
             this.notification('请选择下载路径')
             return false
         }
-        if(!this.downConfStore.tilesType){ 
+        if(!this.downConfStore.downTilesType){ 
             this.notification('请选择下载图片格式')
             return false
         }
-        if(!this.downConfStore.downloadZoom || this.downConfStore.downloadZoom.length !=2){ 
+        if(!this.downConfStore.downZoom || this.downConfStore.downZoom.length !=2){ 
             this.notification('请选择下载层级')
             return false
         }

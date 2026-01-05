@@ -16,13 +16,17 @@
                     <template #title>{{ menu.title }}</template>
                 </el-menu-item>
    
-                <el-menu-item index="99" class="menu-setting">
-                    <el-icon><setting /></el-icon>
-                    <template #title>设置</template>
-                </el-menu-item>
-                <el-menu-item index="100" class="menu-about">
-                    <el-icon><InfoFilled /></el-icon>
-                    <template #title>关于</template>
+                <el-menu-item 
+                    v-for="(menu,index) in appStore.leftBottomMenu" 
+                    :key="menu.key" 
+                    :index="menu.key" 
+                    @click="()=>menuClick(menu)"
+                    class="bottom-menu"
+                    :style="{
+                        bottom:((appStore.leftBottomMenu.length-(index+1))*56)+'px'
+                    }">
+                    <svg-icon  :icon-class="menu.icon" />
+                    <template #title>{{ menu.title }}</template>
                 </el-menu-item>
             </el-menu>
         </el-aside>
@@ -36,20 +40,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref,computed, getCurrentInstance } from 'vue'
+import { ref,computed, getCurrentInstance, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import logo from '@/assets/logo.png'
 import { useAppStore } from '@/store/modules/app'
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const route = useRoute()
 const appStore = useAppStore()
 
 
 const menuactive = computed(() => appStore.selectLeftMenu?.key);
 
 const menuClick = (menu: ILeftMenu) => {
+    if(route.path!=menu.router){
+        proxy?.$router.push(menu.router)
+    }
     appStore.selectLeftMenu = menu
     proxy?.$EventBus.emit('leftmenu-click', menu);
 }
+
+const init = () => { 
+    const topMeun =appStore.leftTopMenu.find((item:ILeftMenu) => item.router === route.path)
+    const bottomMeun =appStore.leftBottomMenu.find((item:ILeftMenu) => item.router === route.path)
+    appStore.selectLeftMenu = topMeun || bottomMeun
+}
+
+onMounted(() => {
+    init()
+})
 
 </script>
 
@@ -93,6 +112,10 @@ const menuClick = (menu: ILeftMenu) => {
     //    bottom: 0;
     }
 
+}
+.bottom-menu{
+    position: absolute;
+    width: 100%;
 }
 .menu-setting{
     position: absolute;
