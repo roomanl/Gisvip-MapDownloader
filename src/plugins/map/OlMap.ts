@@ -12,7 +12,7 @@ import {createStringXY} from 'ol/coordinate'
 import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
 import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
-import { getTdtKey } from '@/utils/settingStore'
+import { getTdtKey } from '@/plugins/store/Setting'
 
 
 export default class OlMap {
@@ -182,12 +182,9 @@ export default class OlMap {
         return output;
     }
     setCenter(center: any){
-        // console.log(center)
         center[0]=parseFloat(center[0])
         center[1]=parseFloat(center[1])
-        // this.mapView.animate({resolution:{resolution:this.resolutions4326[10]},},{center:center})
-    //    this.mapView.setCenter(transform(center, "EPSG:4326", "EPSG:4326"))
-       this.mapView.setCenter(center)
+        this.mapView.setCenter(center)
     }
     setCenterByExtent(extent: any){
         const center=getCenter(extent)

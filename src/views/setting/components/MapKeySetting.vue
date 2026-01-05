@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
     import { onMounted, reactive } from 'vue'
-    import { getTdtKey ,setTdtKey } from '@/utils/settingStore'
+    import { getTdtKey ,setTdtKey } from '@/plugins/store/Setting'
     import { ElNotification } from 'element-plus'
 
     const form = reactive({

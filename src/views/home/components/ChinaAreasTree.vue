@@ -15,7 +15,7 @@
     import axios from 'axios';
     import { onMounted, ref } from 'vue';
     import { getChinaAreasTree } from '@/utils';
-    import {mapManager} from '@/maplib/MapManager';
+    import {mapManager} from '@/plugins/map/MapManager';
 
     const axiosHttp = axios.create({
         baseURL: 'https://geo.datav.aliyun.com/areas_v3/bound/',

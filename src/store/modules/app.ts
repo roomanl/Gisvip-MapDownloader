@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref,computed } from 'vue';
-import { useRouter } from 'vue-router'
+import router from '@/router'
 import { leftMenu } from '@/config/LeftMenuConf';
 
 export const useAppStore = defineStore('app-store', () => {
@@ -16,6 +16,21 @@ export const useAppStore = defineStore('app-store', () => {
     const leftMenuPanelWidth = computed(() => {
         return selectLeftMenu.value?.subPanel?'300px':'65px'
     })
+    const openView = (path:string)=>{
+        const menu = leftMenu.find((item:ILeftMenu) => item.router === path)
+        if(menu){
+            selectLeftMenu.value = menu
+            router.push(menu.router)
+        }
+    }
+    const openViewByIndex = (index:number)=>{
+        const menu = leftMenu[index]
+        if(menu){
+            selectLeftMenu.value = menu
+            router.push(menu.router)
+        }
+    }
+
   
     return {
         leftTopMenu,
@@ -23,5 +38,7 @@ export const useAppStore = defineStore('app-store', () => {
         selectLeftMenu,
         homeMenu,
         leftMenuPanelWidth,
+        openView,
+        openViewByIndex
     };
 });

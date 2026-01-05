@@ -1,5 +1,5 @@
 import { Store } from '@tauri-apps/plugin-store';
-import {  downloadDir } from '@tauri-apps/api/path';
+import {  resourceDir,join   } from '@tauri-apps/api/path';
 
 const store = await Store.load('store.bin');
 const tdtKey = 'tdt-key'
@@ -17,7 +17,7 @@ export const setTdtKey = async (key: string) => {
 export const getDownloadPath = async () => {
   const path = await store.get(downloadPathKey)
   if (!path) {
-    return await downloadDir()
+    return join(await resourceDir(),'map')
   }
   return path
 }

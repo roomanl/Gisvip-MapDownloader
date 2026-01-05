@@ -1,5 +1,5 @@
-import OlMap from '@/maplib/OlMap';
-import DrawTool from '@/maplib/DrawTool';
+import OlMap from '@/plugins/map/OlMap';
+import DrawTool from '@/plugins/map/DrawTool';
 import { useDownConfStore } from '@/store/modules/downConf'
 
 

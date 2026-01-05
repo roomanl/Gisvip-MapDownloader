@@ -10,10 +10,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { onMounted } from 'vue'
+import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 
 const router = useRouter()
 
 const init = async () => { 
+    await sqliteManager.init()
     setTimeout(()=>{
         router.replace('/home')
         // router.push('/home')
