@@ -1,5 +1,3 @@
-import { ElNotification } from 'element-plus'
-import { getTdtKey } from '@/plugins/store/Setting'
 export const getChinaAreasTree = async (geojson: any) => { 
     const areasTree: any = [];
     for (let i = 0; i < geojson.features.length; i++) { 
@@ -28,24 +26,4 @@ export const formatDate = (datetime: string) => {
   const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
   const seconds = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
   return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-};
-
-export const checkTdtKey = async () => { 
-    const tdtKey = await getTdtKey()
-    if(!tdtKey){
-        return false
-    }
-    return true
-};
-export const checkTdtKeyTip = async () => { 
-    if(!await checkTdtKey()){
-        ElNotification({
-            title: '提示',
-            message: '请先在设置里配置天地图key',
-            type:'warning',
-            duration: 2000
-        })
-        return false
-    }
-    return true
 };

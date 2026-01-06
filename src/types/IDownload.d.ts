@@ -10,8 +10,6 @@ export interface DownloadTask {
   speed: number; // B/s
   status: 'pending' | 'downloading' | 'paused' | 'completed' | 'error' | 'cancelled';
   error?: string;
-  createdAt: number;
-  completedAt?: number;
 }
 
 export interface DownloadOptions {

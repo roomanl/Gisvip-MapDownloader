@@ -3,15 +3,16 @@ import { join } from '@tauri-apps/api/path';
 import { useDownConfStore } from '@/store/modules/downConf'
 import { useDownTaskStore } from '@/store/modules/downTask'
 import { useAppStore } from '@/store/modules/app'
-import { checkTdtKeyTip,formatDate } from '@/utils/index'
+import { formatDate } from '@/utils/index'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
-import { calculateTileCount } from '@/plugins/map/Utils'
-import { DownloadManager } from '@/plugins/downloader/DownloadManager'
+import { calculateTileCount,isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
+import DownloadTiles from '@/plugins/map/DownloadTiles'
 
 class DownloadMapManager {
     private downConfStore = useDownConfStore()
     private downTaskStore = useDownTaskStore()
     private appStore = useAppStore()
+    private downloadTasks: Map<string, DownloadTiles> = new Map();
     constructor() {
     }
 
@@ -36,10 +37,29 @@ class DownloadMapManager {
             this.notification('请选择地图源')
             return false
         }
-        if(this.downConfStore.downLayer.layer.id.includes('tdt') && !await checkTdtKeyTip()){
+        if(!await this.checkTdtKey(this.downConfStore.downLayer.layer)){
             return false
         }
         return true
+    }
+    async checkTdtKey(downLayer:any) { 
+        if(isTdt(downLayer.id) && !await checkTdtKeyTip()){
+            return false
+        }
+        return true
+    }
+    async startDownload(taskInfo:any) { 
+        if(!await this.checkTdtKey(JSON.parse(taskInfo.downLayer))){
+            return
+        }
+        let downloadTask = this.downloadTasks.get(taskInfo.id)
+        if(!downloadTask){
+            downloadTask = new DownloadTiles(taskInfo)
+            this.downloadTasks.set(taskInfo.id, downloadTask);
+        }
+        if(downloadTask.status=='pending'){
+            downloadTask.start()
+        }
     }
     async addDownloadTask() { 
         if(!await this.checkDownConf()){
