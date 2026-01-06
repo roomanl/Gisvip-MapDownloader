@@ -48,6 +48,7 @@ const close = async () => {
       cancelButtonText: '取 消',
       type: 'warning',
       showClose:false,
+      lockScroll:false,
       closeOnClickModal: false
     }
   ).then(() => {

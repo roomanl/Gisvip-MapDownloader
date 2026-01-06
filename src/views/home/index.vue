@@ -31,7 +31,7 @@ const appStore = useAppStore()
 
 
 proxy?.$EventBus.on('leftmenu-click', (menu: ILeftMenu)=>{
-    console.log(menu)
+    // console.log(menu)
 });
 
 
