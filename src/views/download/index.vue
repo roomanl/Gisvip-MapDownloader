@@ -38,6 +38,7 @@
     const titleText = ref('任务详情')
     const taskId = ref('')
     const leftPanelRef = ref()
+    const isOnMounted = ref(false)
 
     const goHome = () => {
         appStore.openView('/home')
@@ -59,7 +60,7 @@
 
     const insterNewTask = async () => {
         const task = await downloadMapManager.getDownloadTaskById(taskId.value)
-        console.log(task)
+        // console.log(task)
         task.errorTotal = 0
         task.percentage = 0
         task.taskStatus = 'pending'
@@ -69,6 +70,10 @@
     }
 
     onActivated(()=> {
+        if(isOnMounted.value){
+            isOnMounted.value = false
+            return
+        }
         taskId.value = route.query.taskId
         const type = route.query.type
         if(type=='add'){
@@ -78,6 +83,7 @@
     })
 
     onMounted(() => {
+        isOnMounted.value = true
         init()
     })
 

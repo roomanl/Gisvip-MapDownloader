@@ -26,7 +26,7 @@
 
     const nodeClick = async(data: any,node:any) => { 
         if(!data.url) return;
-        if(isTdt(data.id) && !await checkTdtKeyTip()){
+        if(isTdt(data.mapType) && !await checkTdtKeyTip()){
             return;
         }
         mapManager.loadBaseMap(data,node.parent.data);
