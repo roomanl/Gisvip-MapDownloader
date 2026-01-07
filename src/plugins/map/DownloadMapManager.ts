@@ -5,7 +5,7 @@ import { useDownTaskStore } from '@/store/modules/downTask'
 import { useAppStore } from '@/store/modules/app'
 import { formatDate } from '@/utils/index'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
-import { calculateTileCount,isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
+import { isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
 import DownloadTiles from '@/plugins/map/DownloadTiles'
 
 class DownloadMapManager {
@@ -55,11 +55,44 @@ class DownloadMapManager {
         let downloadTask = this.downloadTasks.get(taskInfo.id)
         if(!downloadTask){
             downloadTask = new DownloadTiles(taskInfo)
+            downloadTask.setCallback(
+                (taskId: any)=>this.downloadTilesSuccess(taskId),
+                (taskId: any)=>this.downloadTilesError(taskId)
+            )
             this.downloadTasks.set(taskInfo.id, downloadTask);
         }
-        if(downloadTask.status=='pending'){
+        if(downloadTask.status=='pending' || downloadTask.status=='error'){
             downloadTask.start()
+            sqliteManager.updateDownloadStatus(taskInfo.id,0)
+        }else if(downloadTask.status=='paused'){ 
+            downloadTask.resumeDownload()
         }
+    }
+    async stopDownload(taskId: any) { 
+        const task = this.downloadTasks.get(taskId)
+        if(task){
+            task.pauseDownload()
+        }
+    }
+    downloadTilesSuccess(taskId: any) { 
+        const task = this.downTaskStore.getTaskInfo(taskId)
+        task.downStatus = 1
+        sqliteManager.updateDownloadStatus(taskId,1)
+        ElNotification({
+          title: '提示',
+          message: `${task.mapName} - ${task.cityName} 下载成功`,
+          type: 'success',
+          duration: 2000
+        })
+    }
+    downloadTilesError(taskId: any) { 
+        ElNotification({
+          title: '提示',
+          message: '下载失败',
+          type: 'error',
+          duration: 2000
+        })
+        sqliteManager.updateDownloadStatus(taskId,2)
     }
     async addDownloadTask() { 
         if(!await this.checkDownConf()){
@@ -75,18 +108,20 @@ class DownloadMapManager {
             downPath: await join(this.downConfStore.downPath,`${this.downConfStore.mapName}-${this.downConfStore.cityName}`.replaceAll(' ','')),
             downUrl: this.downConfStore.downLayer.layer.url,
             downLayer: JSON.stringify(this.downConfStore.downLayer.layer),
-            tileTotal: calculateTileCount(this.downConfStore.downExtent,this.downConfStore.downZoom),
+            tileTotal: this.downConfStore.tileTotal,
             createTime: formatDate(new Date().getTime()),
         }
         const result = await sqliteManager.addDownloadTask(task)
         if(result && result.rowsAffected==1){
             const taskId = result.lastInsertId
-            this.appStore.openView('/download',{taskId})
+            this.appStore.openView('/download',{taskId,type:'add'})
         }
     }
     async getDownloadTasks() { 
-        const result = await sqliteManager.getDownloadTasks()
-        return result
+        return await sqliteManager.getDownloadTasks()
+    }
+    async getDownloadTaskById(taskId: any) {
+        return await sqliteManager.getDownloadTaskById(taskId)
     }
     async deleteDownloadTask(taskId: any){
         const result = await sqliteManager.deleteDownloadTask(taskId)
@@ -100,7 +135,9 @@ class DownloadMapManager {
             // this.downTaskStore.selectTask = {}
         }
         if(this.downTaskStore.selectTask.id==taskId){
-            if(this.downTaskStore.downloadTasks.length>0){
+            if(this.downTaskStore.finishTasks.length>0 && this.downTaskStore.selectTask.downStatus==1){
+                this.downTaskStore.selectTask = this.downTaskStore.finishTasks[0]
+            }else if(this.downTaskStore.downloadTasks.length>0){
                 this.downTaskStore.selectTask = this.downTaskStore.downloadTasks[0]
             }else{
                 this.downTaskStore.selectTask = {}
@@ -108,16 +145,20 @@ class DownloadMapManager {
         }
         this.notification('删除成功','success')
     }
-    getTaskStatusText(status: any){
+    getTaskStatusAlis(status: any,type?: any){
         switch (status) {
-            case 'waiting':
-                return '等待下载'
+            case 'pending':
+                return type=='text'?'等待下载':(type=='color'?'#909399':'icon')
             case 'downloading':
-                return '下载中'
-            case 'finish':
-                return '已完成'
+                return type=='text'?'下载中':(type=='color'?'#409EFF':'icon')
+            case 'paused':
+                return type=='text'?'暂停下载':(type=='color'?'#E6A23C':'icon')
+            case 'completed':
+                return type=='text'?'下载完成':(type=='color'?'#67C23A':'icon')
+            case 'error':
+                return type=='text'?'下载失败':(type=='color'?'#F56C6C':'icon')
             default:
-                return ''
+                return type=='text'?'等待下载':(type=='color'?'#E6A23C':'icon')
         }
     }
     notification(message: string,type?: string){

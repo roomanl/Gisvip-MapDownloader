@@ -27,3 +27,15 @@ export const formatDate = (datetime: string) => {
   const seconds = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
   return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
 };
+
+export const getPercentage = (num: number, total: number) => { 
+    if(num ==0 || total==0){
+        return 0;
+    }
+    let percentage = ((num / total) * 100);
+    if(percentage>=100){
+        return  100;
+    }else{
+        return isNaN(percentage)?0:percentage.toFixed(2);
+    }
+};
