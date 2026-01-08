@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
     import { onMounted, ref } from 'vue';
-    import { layerList } from '@/plugins/map/LayerList';
+    import { layerList } from '@/config/LayerList';
     import {mapManager} from '@/plugins/map/MapManager';
     import { isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
 

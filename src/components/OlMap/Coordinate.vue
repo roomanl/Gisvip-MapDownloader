@@ -14,15 +14,16 @@
 <script setup lang="ts">
 import { onMounted, ref} from 'vue'
 import {mapManager} from '@/plugins/map/MapManager';
+import { transformToWgs84 } from '@/plugins/map/TransformUtils'
 
 
 const coordinate = ref([0,0]);
 const show = ref(true);
 
 const init = () => {
-    coordinate.value = mapManager.olMap.transformCoordinates(mapManager.olMap.getMapView().getCenter(),mapManager.olMap.getMapView().getProjection(),'EPSG:4326');
+    coordinate.value = transformToWgs84(mapManager.olMap.getMapView().getCenter(),mapManager.olMap.getMapView().getProjection());
     mapManager.olMap.getMap().on('pointermove', (evt:any)=>{
-        coordinate.value = mapManager.olMap.transformCoordinates(evt.coordinate,mapManager.olMap.getMapView().getProjection(),'EPSG:4326')
+        coordinate.value = transformToWgs84(evt.coordinate,mapManager.olMap.getMapView().getProjection())
         // show.value = true;
     })
 }
