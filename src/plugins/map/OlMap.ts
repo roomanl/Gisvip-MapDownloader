@@ -3,12 +3,9 @@ import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
 import Graticule from 'ol/layer/Graticule'
 import SourceXYZ from 'ol/source/XYZ'
-import TileDebug from 'ol/source/TileDebug'
 import ScaleLine from 'ol/control/ScaleLine';
 import OverviewMap from 'ol/control/OverviewMap';
 import MousePosition from 'ol/control/MousePosition';
-import ZoomSlider from 'ol/control/ZoomSlider';
-import {createStringXY} from 'ol/coordinate'
 import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
 import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
@@ -23,8 +20,7 @@ export default class OlMap {
     private labelLayer: any;
     private gridLayer:any;
     private graticuleLayer: any;
-    private mapView4326: any;
-    private mapView3857: any;
+    private mapView: any;
     private map: any;
     private overviewMap: OverviewMap;
     private mousePosition:MousePosition;
@@ -40,26 +36,23 @@ export default class OlMap {
 
 
     initMap(mapTarget: any) {
-        this.mapView4326 = new View({
-            projection: 'EPSG:4326',
+        this.mapView = new View({
+            projection: this.baseProjection,
             zoom: 1,
-            maxZoom:18
-        })
-        this.mapView3857 = new View({
-            projection: 'EPSG:3857',
-            zoom: 1,
-            maxZoom:18
+            maxZoom:19
         })
         this.map = new Map({
             target: mapTarget,
-            // view: this.mapView4326
+            view: this.mapView
         })
         this.initControl()
         this.initGraticule()
+        const center=this.transform4326To3857(this.baseCenter)
+        this.setCenter(center)
+        this.setZoom(10)
     }
     initControl(){
         this.map.addControl(new ScaleLine())
-        this.map.addControl(new ZoomSlider())
     }
     addOverviewMap(layer: any){
         if(this.overviewMap){
@@ -72,16 +65,6 @@ export default class OlMap {
         })
         this.map.addControl(this.overviewMap)
         // console.log(this.overviewMap)
-    }
-    addMousePosition(){
-        if(this.mousePosition){
-            this.map.removeControl(this.mousePosition)
-        }
-        this.mousePosition=new MousePosition({
-            coordinateFormat:createStringXY(4),
-            projection: this.getMapView().getProjection()
-        })
-        this.map.addControl(this.mousePosition);
     }
 
     initGraticule(){ 
@@ -110,29 +93,10 @@ export default class OlMap {
         if(this.gridLayer)
             this.map.removeLayer(this.gridLayer)
     }
-    switchMapView(layer: any){
-        this.map.getLayers().clear();
-        let center = this.getMapView().getCenter()
-        let zoom = this.getMapView().getZoom()
-        zoom = zoom?zoom:10
-        if(!center){
-            center  = this.transformCoordinates(this.baseCenter,'EPSG:4326',layer.prejection)
-        }else{
-            center = this.transformCoordinates(center,this.getMapView().getProjection(),layer.prejection)
-        }
-        if(layer.prejection.includes('4326')){
-            this.map.setView(this.mapView4326)
-        }else if(layer.prejection.includes('3857')){
-            this.map.setView(this.mapView3857)
-        }
-        this.setCenter(center)
-        this.setZoom(zoom)
-        this.addMousePosition()
-    }
 
     async loadBaseMap(layer: any){
         // console.log(layer)
-        this.switchMapView(layer)
+        this.map.getLayers().clear();
         this.baseMapLayer=await this.getLayer(layer)
         if(layer.labelLayer){
             this.labelLayer=await this.getLayer(layer.labelLayer)
@@ -182,6 +146,13 @@ export default class OlMap {
         }
         return output;
     }
+    transform4326To3857(coordinates: any){
+        return this.transformCoordinates(coordinates,'EPSG:4326','EPSG:3857')
+    }
+    transform3857To4326(coordinates: any){
+        return this.transformCoordinates(coordinates,'EPSG:3857','EPSG:4326')
+    }
+
     transformCoordinates(coordinates: any,source: any,destination:any){
         // console.log(coordinates,source,destination)
         return transform(coordinates,source,destination)

@@ -16,6 +16,9 @@
             <el-form-item label="坐标范围">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.downExtent }}</el-text>
             </el-form-item>
+            <el-form-item label="下载坐标系">
+                <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.projection }}</el-text>
+            </el-form-item>
             <el-form-item label="瓦片格式">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.downTilesType }}</el-text>
             </el-form-item>

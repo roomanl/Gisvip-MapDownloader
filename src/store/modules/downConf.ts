@@ -11,6 +11,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
     const downLayer = ref(undefined)
     const downArea = ref(undefined)
     const tileTotal = ref(0)
+    const projection = ref('EPSG:3857')
 
     const mapName = computed(()=>{
         if(!downLayer.value){
@@ -50,6 +51,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         mapName,
         cityName,
         cityArea,
-        tileTotal
+        tileTotal,
+        projection
     };
 });

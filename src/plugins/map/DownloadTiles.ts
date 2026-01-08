@@ -5,7 +5,7 @@ import { join } from '@tauri-apps/api/path';
 import { writeFile, mkdir, exists,remove as removeFile } from "@tauri-apps/plugin-fs";
 import { nanoid } from 'nanoid';
 import { getTdtKey } from '@/plugins/store/Setting'
-import { isTdt,startXYAndendXy } from '@/plugins/map/Utils'
+import { isTdt,longlat2tile } from '@/plugins/map/Utils'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 import { getPercentage } from '@/utils/index'
 import { RandomUserAgent } from '@/utils/userAgent';
@@ -35,9 +35,10 @@ export default class DownloadTiles {
     const extent = JSON.parse(this.taskInfo.downExtent);
     const [minLng, minLat, maxLng, maxLat] = extent;
     for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
-      const {startX,endX,startY,endY} = startXYAndendXy(extent,zoom);
-      for (let x = startX; x <= endX; x++) {
-        for (let y = startY; y <= endY; y++) {
+      const topLeft = longlat2tile(minLng, maxLat, zoom);
+      const bottomRight = longlat2tile(maxLng, minLat, zoom);
+      for (let x = topLeft.x; x <= bottomRight.x; x++) {
+        for (let y = topLeft.y; y <= bottomRight.y; y++) {
           // const downUrl ='https://blog.gisvip.cn/data/image/2025/12/29/34674_stle_6580.png'
           // const downUrl ='http://192.168.1.201/001.jpg'
           const downUrl =await this.getTileUrl( x, y, zoom );

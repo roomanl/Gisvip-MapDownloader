@@ -17,6 +17,11 @@
             <el-form-item v-if="downConfStore.downExtent.length" label="瓦片数量" label-position="left">
                 {{ downConfStore.tileTotal }}
             </el-form-item>
+            <el-form-item label="下载坐标系">
+                <el-select v-model="downConfStore.projection">
+                    <el-option label="EPSG:3857" value="EPSG:3857"/>
+                </el-select>
+            </el-form-item>
             <el-form-item label="瓦片格式">
                 <el-select v-model="downConfStore.downTilesType">
                     <el-option label="jpg" value="jpg"/>

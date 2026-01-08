@@ -1,6 +1,8 @@
 <template>
     <div ref="rootmap" class="map-root">
         <slot name="content"></slot>
+        <Coordinate class="coordinate" />
+        <Zoomslider class="zoomslider" />
     </div>
 </template>
 
@@ -8,6 +10,8 @@
 import { ref, onMounted } from 'vue';
 import 'ol/ol.css'
 import {mapManager} from '@/plugins/map/mapManager';
+import Coordinate from './Coordinate.vue';
+import Zoomslider from './Zoomslider.vue';
 
 const rootmap = ref<HTMLElement | null>(null);
 
@@ -39,7 +43,14 @@ onMounted(() => {
         bottom: 10px;
         left: 10px;
         z-index: 999;
-        box-shadow: var(--el-box-shadow);
+        box-shadow: 0px 2px 4px  rgba(0, 0, 0, 0.25);
+    }
+    .zoomslider{
+        position: absolute;
+        top: 100px;
+        right: 10px;
+        z-index: 999;
+        box-shadow: 0px 2px 4px  rgba(0, 0, 0, 0.25);
     }
 
    
@@ -95,7 +106,7 @@ onMounted(() => {
         background-color: rgba(255,255,255,0.8);
     }
     :deep(.ol-scale-line){
-        left: 200px;
+        left: 330px;
         bottom: 10px;
         box-shadow: 0px 2px 4px  rgba(0, 0, 0, 0.25);
         background-color: rgba(255,255,255,0.8);

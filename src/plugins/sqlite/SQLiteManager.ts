@@ -7,8 +7,10 @@ class SQLiteManager {
         this.init();
     }
     async init() {
-        this.db = await Database.load('sqlite:gisvipmap.db');
-        await this.initTable();
+        if(!this.db){
+            this.db = await Database.load('sqlite:gisvipmap.db');
+            await this.initTable();
+            }
     }
     async initTable() {
         await this.db.execute(`
@@ -17,6 +19,7 @@ class SQLiteManager {
                 mapName TEXT NOT NULL,
                 cityName TEXT NOT NULL,
                 cityArea TEXT NOT NULL,
+                projection TEXT NOT NULL,
                 downExtent TEXT NOT NULL,
                 downZoom TEXT NOT NULL,
                 downTilesType TEXT NOT NULL,
@@ -36,6 +39,7 @@ class SQLiteManager {
                 mapName,
                 cityName,
                 cityArea,
+                projection,
                 downExtent,
                 downZoom,
                 downTilesType,
@@ -44,18 +48,20 @@ class SQLiteManager {
                 downLayer,
                 tileTotal,
                 createTime
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?) `,
-            [task.mapName,task.cityName,task.cityArea, task.downExtent, task.downZoom, task.downTilesType, task.downPath, task.downUrl, task.downLayer, task.tileTotal, task.createTime]
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) `,
+            [task.mapName,task.cityName,task.cityArea,task.projection,task.downExtent, task.downZoom, task.downTilesType, task.downPath, task.downUrl, task.downLayer, task.tileTotal, task.createTime]
         );
         return result;
     }
     async getDownloadTasks() {
+        await this.init();
         const result = await this.db.select(`
             SELECT * FROM download_task order by id desc
         `);
         return result;
     }
     async getDownloadTaskById(taskId: any) {
+        await this.init();
         const result = await this.db.select(`
             SELECT * FROM download_task WHERE id = ?`, 
             [taskId]
@@ -63,6 +69,7 @@ class SQLiteManager {
         return result?.[0];
     }
     async updateDownloadStatus(taskId: any, status: any) {
+        await this.init();
         const result =await this.db.execute(`
             UPDATE download_task SET downStatus = ? WHERE id = ?`, 
             [status, taskId]
@@ -70,6 +77,7 @@ class SQLiteManager {
         return result;
     }
     async updateDownloadSuccessTotal(taskId: any, total: any) {
+        await this.init();
         const result = await this.db.execute(`
             UPDATE download_task SET successTotal = ? WHERE id = ?`, 
             [total, taskId]
@@ -77,6 +85,7 @@ class SQLiteManager {
         return result;
     }
     async deleteDownloadTask(taskId: any) {
+        await this.init();
         const result = await this.db.execute(`
             DELETE FROM download_task WHERE id = ?`, 
             [taskId]
