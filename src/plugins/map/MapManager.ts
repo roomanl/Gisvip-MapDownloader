@@ -24,6 +24,8 @@ class MapManager {
     loadBaseMap(layer: any,parentData:any){
         this.olMap.loadBaseMap(layer);
         this.downConfStore.downLayer = {layer:layer,parent:parentData};
+        this.downConfStore.projection = layer.projection;
+        console.log(layer);
     }
     selectArea(city:any,parentCity:any){
         this.drawTool.clear();
