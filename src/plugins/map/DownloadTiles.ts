@@ -4,7 +4,7 @@ import { fetch } from '@tauri-apps/plugin-http';
 import { join } from '@tauri-apps/api/path';
 import { writeFile, mkdir, exists,remove as removeFile } from "@tauri-apps/plugin-fs";
 import { nanoid } from 'nanoid';
-import { getTdtKey } from '@/plugins/store/Setting'
+import { getTdtKey,getDownloadLimit } from '@/plugins/store/Setting'
 import { isTdt,longlat2tile } from '@/plugins/map/Utils'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 import { getPercentage } from '@/utils/index'
@@ -29,9 +29,9 @@ export default class DownloadTiles {
   private failCallback: Function;
   constructor(taskInfo: any) {
     this.taskInfo = taskInfo;
-    this.init();
   }
   async init() { 
+    this.concurrentLimit = await getDownloadLimit();
     this.downLayer = JSON.parse(this.taskInfo.downLayer);
     this.downUrl = this.downLayer.url;
     if(isTdt(this.downLayer.mapType)){
