@@ -9,6 +9,9 @@
             <el-divider direction="vertical" />
             {{ downConfStore.cityArea }}
         </div>
+        <!-- <div class="inline projection">
+            <el-text type="info">底图坐标系：EPSG:3857</el-text>
+        </div> -->
     </div>
 </template>
 
@@ -23,5 +26,8 @@ import { useDownConfStore } from '@/store/modules/downConf'
 <style scoped>
 .inline{
     display: inline;
+}
+.projection{
+    float: right;
 }
 </style>

@@ -14,6 +14,9 @@
             <el-form-item :label="getdownZoomTitle">
                 <el-slider v-model="downConfStore.downZoom" @change="tileTotalChange" range show-stops size="small" :max="18" :min="1" />
             </el-form-item>
+            <el-form-item label="源坐标系" label-position="left">
+                {{ downConfStore.projection }}
+            </el-form-item>
             <el-form-item v-if="downConfStore.downExtent.length" label="瓦片数量" label-position="left">
                 {{ downConfStore.tileTotal }}
             </el-form-item>
@@ -22,11 +25,25 @@
                     <el-option label="EPSG:3857" value="EPSG:3857"/>
                 </el-select>
             </el-form-item> -->
-            <el-form-item label="瓦片格式">
-                <el-select v-model="downConfStore.downTilesType">
+            <el-form-item label="瓦片格式" label-position="left">
+                <el-dropdown :hide-on-click="true" trigger="click">
+                    <span class="el-dropdown-link">
+                        <el-button text plain>
+                            {{ downConfStore.downTilesType }}
+                             <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                        </el-button>
+                    </span>
+                    <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="downConfStore.downTilesType='jpg'">jpg</el-dropdown-item>
+                        <el-dropdown-item @click="downConfStore.downTilesType='png'">png</el-dropdown-item>
+                    </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+                <!-- <el-select v-model="downConfStore.downTilesType">
                     <el-option label="jpg" value="jpg"/>
                     <el-option label="png" value="png"/>
-                </el-select>
+                </el-select> -->
             </el-form-item>
             <el-form-item label="下载路径">
                 <el-input v-model="downConfStore.downPath" readonly @click="selectPath" />

@@ -16,8 +16,11 @@
             <el-form-item label="坐标范围">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.downExtent }}</el-text>
             </el-form-item>
-            <el-form-item label="下载坐标系">
+            <el-form-item label="源坐标系">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.projection }}</el-text>
+            </el-form-item>
+            <el-form-item label="瓦片注记">
+                <el-text class="text-info" type="info" size="default">{{ labelLayerText }}</el-text>
             </el-form-item>
             <el-form-item label="瓦片格式">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.downTilesType }}</el-text>
@@ -28,9 +31,9 @@
             <el-form-item label="保存路径">
                 <el-text class="text-info" type="info" size="default" line-clamp="2">{{ downTaskStore.selectTask.downPath }}</el-text>
             </el-form-item>
-            <el-form-item label="下载地址">
-                <el-text class="text-info" type="info" size="default" line-clamp="2">{{ downTaskStore.selectTask.downUrl }}</el-text>
-            </el-form-item>
+            <!-- <el-form-item label="下载地址">
+                <el-text class="text-info" type="info" size="default" line-clamp="1">{{ downTaskStore.selectTask.downUrl }}</el-text>
+            </el-form-item> -->
             <el-form-item v-if="downTaskStore.selectTask.downStatus!=1">
                 <div style="padding-top: 20px;width: 100%;">
                     <el-progress :percentage="downTaskStore.selectTask.percentage" />
@@ -71,6 +74,10 @@
     })
     const taskStatusColor = computed(() => {
         return downloadMapManager.getTaskStatusAlis(downTaskStore.selectTask.taskStatus,'color')
+    })
+    const labelLayerText = computed(() => {
+        const downLayer = JSON.parse(downTaskStore.selectTask.downLayer)
+        return downLayer.labelLayer?'无注记':'自带注记'
     })
     const startTask = async () => {
         const task = downTaskStore.getTaskInfo(downTaskStore.selectTask.id)
