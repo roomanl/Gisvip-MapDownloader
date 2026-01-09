@@ -39,6 +39,11 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         }
         return downArea.value.area
     })
+    const getFullName = () =>{
+        return `${mapName.value}-${cityName.value}(${projection.value})`
+                .replaceAll(' ','')
+                .replaceAll('EPSG:','')
+    }
   
     return {
         downExtent,
@@ -52,6 +57,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         cityName,
         cityArea,
         tileTotal,
-        projection
+        projection,
+        getFullName
     };
 });
