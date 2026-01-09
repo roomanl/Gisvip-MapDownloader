@@ -1,19 +1,18 @@
 <template>
     <div class="header-container">
         <div class="right-container">
-            <el-button text plain :icon="SemiSelect" @click="minimize" />
-            <el-button text plain :icon="FullScreen" @click="toggleMaximize" />
-            <el-button text plain :icon="CloseBold" @click="close" />
+            <el-button text plain icon="SemiSelect" @click="minimize" />
+            <el-button text plain icon="FullScreen" @click="toggleMaximize" />
+            <el-button text plain icon="CloseBold" @click="close" />
         </div>
     </div>
-    <div class="top-title">
-        <div>标题</div>
+    <div class="top-title" id="layout-toptitle-subpanel">
+
     </div>
 </template>
 
 <script setup lang="ts">
 import{ref, onMounted } from 'vue'
-import { FullScreen,SemiSelect,CloseBold } from '@element-plus/icons-vue'
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 const appWindow = getCurrentWindow();
@@ -64,6 +63,8 @@ onMounted(() => {
 }
 .top-title{
     padding: 0 20px;
+    height: 30px;
+    max-height: 30px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--el-menu-border-color);
     -webkit-app-region: drag;

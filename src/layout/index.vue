@@ -1,14 +1,14 @@
 <template>
     <div class="app-main">
         <el-container class="container">
-            <el-aside width="250px" class="aside">
+            <el-aside :width="appStore.leftMenuPanelWidth" class="aside">
                 <LeftPanel></LeftPanel>
             </el-aside>
              <el-container>
                 <el-header>
                     <topHeader></topHeader>
                 </el-header>
-                <el-main>
+                <el-main class="main-container">
                     <router-view v-slot="{ Component, route }">
                         <transition name="fade-transform" mode="out-in">
                             <keep-alive>
@@ -25,7 +25,9 @@
 <script setup>
 import topHeader from './components/Header.vue';
 import LeftPanel from './components/LeftPanel.vue';
+import { useAppStore } from '@/store/modules/app'
 
+const appStore = useAppStore()
 </script>
 
 <style lang="scss" scoped>
@@ -36,6 +38,9 @@ import LeftPanel from './components/LeftPanel.vue';
   padding: 0;
   position: relative;
   overflow: hidden;
+}
+.main-container{
+    padding: 0;
 }
 .aside{
     border-right: 1px solid var(--el-menu-border-color);

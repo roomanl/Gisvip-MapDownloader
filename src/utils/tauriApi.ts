@@ -18,5 +18,11 @@ export const getCurrentWindowInstance = async () => {
  * 退出应用
  */
 export const  exitApp = async () => {
-    await exit();
+    try {
+        await exit(1);
+    } catch (error) {
+        console.warn('Process plugin not available, using alternative exit method:', error);
+        // Fallback to closing the window if plugin is not available
+        await getCurrentWindow().close();
+    }
 }

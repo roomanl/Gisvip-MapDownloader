@@ -13,40 +13,40 @@
     "windows": [
       {
         "title": "Gisvip地图下载器",
-        "width": 1000,
-        "height": 600,
-        "decorations": false 
+        "label": "main",
+        "width": 1100,
+        "height": 700,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "center": true,
+        "decorations": false,
+        "visible": false
       }
     ],
     "security": {
-      "csp": "default-src 'self'",
-      "dangerousDisableAssetCspModification": false,
-      "capabilities":[
-        {
-          "identifier": "main-capability",
-          "windows": ["main"],
-          "permissions": [
-           "core:window:allow-maximize",
-           "core:window:allow-minimize",
-           "core:window:allow-unminimize",
-           "core:window:allow-unmaximize",
-           "core:window:allow-close",
-           "core:window:allow-is-visible",
-           "core:window:allow-set-focus",
-           "core:window:default",
-           "core:menu:allow-new",
-           "core:menu:default",
-           "core:tray:allow-new",
-           "core:tray:default",
-           "process:allow-exit"
-          ]
-        }
-      ]
+      "csp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": [
+      "nsis"
+    ],
+    "resources": [],
+    "windows": {
+      "wix": {
+        "language": "zh-CN"
+      },
+      "nsis": {
+        "languages": [
+          "SimpChinese"
+        ],
+        "installerIcon": "icons/icon.ico"
+      },
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

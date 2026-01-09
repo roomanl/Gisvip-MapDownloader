@@ -1,21 +1,24 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig, loadEnv } from 'vite';
+import { fileURLToPath, URL } from "node:url";
 import path from "path";
+import createVitePlugins from './vite/plugins'
 
-// @ts-expect-error process is a nodejs global
-const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
-  plugins: [vue()],
+export default defineConfig(({ mode, command }) => {
+  // @ts-expect-error process is a nodejs global
+  const host = process.env.TAURI_DEV_HOST;
+  const env = loadEnv(mode, process.cwd());
+  return {
+  //  base:'./',
+  plugins: createVitePlugins(env, command === 'build'),
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
     extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
   },
-
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent Vite from obscuring rust errors
@@ -37,4 +40,14 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-}));
+  optimizeDeps: {
+      include: [
+        'vue',
+        'vue-router',
+        'pinia',
+        'element-plus/es/components/**/css',
+        "src/types/*.d.ts"
+      ]
+    }
+}
+});
