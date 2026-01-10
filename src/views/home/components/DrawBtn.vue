@@ -35,7 +35,9 @@
             drawEnd: (evt: any) => {
                 const extent = evt.feature.getGeometry().getExtent().map(num => parseFloat(num.toFixed(6)));
                 downConfStore.downloadExtent = extent;
-                proxy?.$EventBus.emit('switch-area', {area:{name:'自定义区域'},parent:{}});
+                const evtData = {area:{name:'自定义区域'},parent:{}};
+                downConfStore.downArea = evtData;
+                proxy?.$EventBus.emit('switch-area', evtData);
             }
         });
     };

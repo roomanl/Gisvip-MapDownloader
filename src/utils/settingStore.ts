@@ -7,7 +7,7 @@ const downloadPathKey = 'download-path'
 
 export const getTdtKey = async () => {
   const key = await store.get(tdtKey)
-  return key.replaceAll(/\s/g,'');
+  return key;
 }
 export const setTdtKey = async (key: string) => {
   await store.set(tdtKey, key.replaceAll(/\s/g,''))

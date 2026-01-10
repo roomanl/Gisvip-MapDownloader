@@ -5,13 +5,17 @@ export const useDownConfStore = defineStore('downConf-store', () => {
   
     const downloadExtent = ref([])
     const downloadZoom = ref([5,10])
-    const tilesYype = ref('jpg')
+    const tilesType = ref('jpg')
     const downloadPath = ref('')
+    const downLayer = undefined
+    const downArea = undefined
   
     return {
         downloadExtent,
         downloadZoom,
-        tilesYype,
-        downloadPath
+        tilesType,
+        downloadPath,
+        downLayer,
+        downArea
     };
 });
