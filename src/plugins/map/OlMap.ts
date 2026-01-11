@@ -8,11 +8,13 @@ import OverviewMap from 'ol/control/OverviewMap';
 import MousePosition from 'ol/control/MousePosition';
 import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
-import {getTopLeft, getWidth,getCenter} from 'ol/extent'
+import {getTopLeft, getWidth,getCenter,applyTransform} from 'ol/extent'
 import {get as getProjection,addProjection,addCoordinateTransforms} from 'ol/proj';
 import { getTdtKey } from '@/plugins/store/Setting'
 import { gcj02ToMercator } from '@/plugins/map/TransformUtils'
 import { gcj02Mecator,smerc2gmerc,gmerc2smerc,gmerc2ll,ll2gmerc } from '@/plugins/map/Gcj02MecatorProjection'
+import { bd09Mecator,smerc2bmerc,bmerc2smerc,bmerc2ll,ll2bmerc } from '@/plugins/map/BD09MCProjection'
+import BaiDuLayer from '@/plugins/map/BaiDuLayer'
 import { isTdt } from '@/plugins/map/Utils'
 
 
@@ -33,7 +35,6 @@ export default class OlMap {
         this.opacity = 1;
         this.baseMapLayer = null;
         this.labelLayer = null;
-        
     }
 
 
@@ -47,7 +48,7 @@ export default class OlMap {
             target: mapTarget,
             view: this.mapView
         })
-        this.initgcj02Mecator()
+        this.initCustomProjection()
         this.initControl()
         this.initGraticule()
         this.setCenter(this.baseCenter)
@@ -56,10 +57,13 @@ export default class OlMap {
     initControl(){
         this.map.addControl(new ScaleLine())
     }
-    initgcj02Mecator(){
+    initCustomProjection(){
         addProjection(gcj02Mecator);
         addCoordinateTransforms('EPSG:4326', gcj02Mecator, ll2gmerc, gmerc2ll);
         addCoordinateTransforms('EPSG:3857', gcj02Mecator, smerc2gmerc, gmerc2smerc);
+        addProjection(bd09Mecator);
+        addCoordinateTransforms('EPSG:4326', bd09Mecator, ll2bmerc, bmerc2ll);
+        addCoordinateTransforms('EPSG:3857', bd09Mecator, smerc2bmerc, bmerc2smerc);
     }
     addOverviewMap(layer: any){
         if(this.overviewMap){
@@ -132,8 +136,9 @@ export default class OlMap {
                     crossOrigin: 'anonymous',
                     url: mapUrl,
                 }),
-                id:layer.id
             })
+        }else if(layer.layerType=='bdtiles'){
+            baseMapLayer=new BaiDuLayer(layer)
         }
         return baseMapLayer
     }
