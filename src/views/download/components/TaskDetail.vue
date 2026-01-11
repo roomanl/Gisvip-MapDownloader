@@ -19,7 +19,7 @@
             <el-form-item label="源坐标系">
                 <el-text class="text-info" type="info" size="default">{{ downTaskStore.selectTask.projection }}</el-text>
             </el-form-item>
-            <el-form-item label="瓦片注记">
+            <el-form-item v-if="showLabelLayerForm" label="瓦片注记">
                 <el-text class="text-info" type="info" size="default">{{ labelLayerText }}</el-text>
             </el-form-item>
             <el-form-item label="瓦片格式">
@@ -81,6 +81,10 @@
     const labelLayerText = computed(() => {
         const downLayer = JSON.parse(downTaskStore.selectTask.downLayer)
         return downLayer.labelLayer?'无注记':'自带注记'
+    })
+    const showLabelLayerForm = computed(() => {
+        const downLayer = JSON.parse(downTaskStore.selectTask.downLayer)
+        return !downLayer.id.includes('label')
     })
     const startTask = async () => {
         const task = downTaskStore.getTaskInfo(downTaskStore.selectTask.id)

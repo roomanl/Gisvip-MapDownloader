@@ -37,6 +37,7 @@
     const route = useRoute()
     const titleText = ref('任务详情')
     const taskId = ref('')
+    const labelTaskId = ref('')
     const leftPanelRef = ref()
     const isOnMounted = ref(false)
 
@@ -59,6 +60,14 @@
     }
 
     const insterNewTask = async () => {
+        if(labelTaskId.value){
+            const labelTask = await downloadMapManager.getDownloadTaskById(labelTaskId.value)
+            labelTask.errorTotal = 0
+            labelTask.percentage = 0
+            labelTask.taskStatus = 'pending'
+            downTaskStore.tasks.unshift(labelTask);
+            downTaskStore.selectTask = labelTask
+        }
         const task = await downloadMapManager.getDownloadTaskById(taskId.value)
         // console.log(task)
         task.errorTotal = 0
@@ -75,6 +84,7 @@
             return
         }
         taskId.value = route.query.taskId
+        labelTaskId.value = route.query.labelTaskId
         const type = route.query.type
         if(type=='add'){
             insterNewTask()

@@ -25,6 +25,9 @@ export const checkTdtKeyTip = async () => {
 export const isTdt = (mapType: string) =>{
   return mapType == 'tdt'
 }
+export const isTencent = (mapType: string) =>{
+  return mapType == 'tencent'
+}
 
 // 经纬度转瓦片行列号
 export const longlat2tile=(lon:number, lat:number, zoom:number)=> {

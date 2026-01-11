@@ -118,9 +118,29 @@ class DownloadMapManager {
             createTime: formatDate(new Date().getTime()),
         }
         const result = await sqliteManager.addDownloadTask(task)
+        let labelTaskId = undefined
+        if(this.downConfStore.downLabel && this.downConfStore.downLayer.layer.labelLayer){
+            const labelTask = {
+                mapName: this.downConfStore.getLabelMapName(),
+                cityName: this.downConfStore.cityName,
+                cityArea: this.downConfStore.cityArea,
+                fullName: this.downConfStore.getLabelFullName(),
+                projection: this.downConfStore.projection,
+                downExtent: JSON.stringify(this.downConfStore.downExtent),
+                downZoom: JSON.stringify(this.downConfStore.downZoom),
+                downTilesType: this.downConfStore.downTilesType,
+                downPath: await join(this.downConfStore.downPath,this.downConfStore.getLabelFullName() ),
+                downUrl: this.downConfStore.downLayer.layer.labelLayer.url,
+                downLayer: JSON.stringify(this.downConfStore.downLayer.layer.labelLayer),
+                tileTotal: this.downConfStore.tileTotal,
+                createTime: formatDate(new Date().getTime()),
+            }
+             const labelResult =await sqliteManager.addDownloadTask(labelTask)
+             labelTaskId = labelResult.lastInsertId;
+        }
         if(result && result.rowsAffected==1){
             const taskId = result.lastInsertId
-            this.appStore.openView('/download',{taskId,type:'add'})
+            this.appStore.openView('/download',{taskId,labelTaskId,type:'add'})
         }
     }
     async getDownloadTasks() { 

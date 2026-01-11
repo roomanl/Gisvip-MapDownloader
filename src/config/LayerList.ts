@@ -68,6 +68,14 @@ export const layerList =[
         subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&v=009&scaler=1&p=1&udt=20260108',
       },{
+        label: '电子地图(精美)',
+        id: 'bdmap-normal-complex',
+        mapType: 'bdmap',
+        layerType: 'bdtiles',
+        projection: 'DB09-MC',
+        subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=vtile&x={x}&y={y}&z={z}&styles=pl&v=009&scaler=1&p=1&udt=20260108',
+      },{
         label: '电子地图(精简)',
         id: 'bdmap-normal-lite',
         mapType: 'bdmap',
@@ -76,7 +84,7 @@ export const layerList =[
         subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=vtile&x={x}&y={y}&z={z}&styles=pl&v=009&scaler=1&p=1&udt=20260108&styleId=1',
       },{
-        label: '卫星地图',
+        label: '卫星地图(普通注记)',
         id: 'bdmap-satellite',
         mapType: 'bdmap',
         layerType: 'bdtiles',
@@ -84,7 +92,7 @@ export const layerList =[
         subdomain: [0, 1, 2, 3],
         url:'http://maponline{0-3}.bdimg.com/starpic/?qt=satepc&u=x={x};y={y};z={z};v=009;type=sate&styles=sl&v=009&scaler=1&p=1&udt=20260108',
         labelLayer:{
-          label: '卫星地图注记',
+          label: '卫星地图普通注记',
           id: 'bdmap-satellite-label',
           mapType: 'bdmap',
           layerType: 'bdtiles',
@@ -92,8 +100,85 @@ export const layerList =[
           subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
           url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=sl&v=009&scaler=1&p=1&udt=20260108',
         }
+      },{
+        label: '卫星地图(精美注记)',
+        id: 'bdmap-satellite',
+        mapType: 'bdmap',
+        layerType: 'bdtiles',
+        projection: 'DB09-MC',
+        subdomain: [0, 1, 2, 3],
+        url:'http://maponline{0-3}.bdimg.com/starpic/?qt=satepc&u=x={x};y={y};z={z};v=009;type=sate&styles=sl&v=009&scaler=1&p=1&udt=20260108',
+        labelLayer:{
+          label: '卫星地图精美注记',
+          id: 'bdmap-satellite-complex-label',
+          mapType: 'bdmap',
+          layerType: 'bdtiles',
+          projection: 'DB09-MC',
+          subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=vtile&x={x}&y={y}&z={z}&styles=sl&v=009&scaler=1&p=1&udt=20260108',
+        }
       }
     ]
+  },
+  {
+    label: '腾讯地图',
+    id: 'tencent',
+    children: [
+      {
+        label: '电子地图',
+        id: 'tencent-normal',
+        mapType: 'tencent',
+        layerType: 'tencenttiles',
+        projection: 'GCJ-02',
+        subdomain: [0,1, 2, 3],
+        url:'https://rt{0-3}.map.gtimg.com/realtimerender?z={z}&x={x}&y={y}',
+      },
+      {
+        label: '卫星地图',
+        id: 'tencent-satellite',
+        mapType: 'tencent',
+        layerType: 'tencenttiles',
+        projection: 'GCJ-02',
+        subdomain: [0,1, 2, 3],
+        url:'https://p0.map.gtimg.com/sateTiles/{z}/{m}/{n}/{x}_{y}.jpg',
+        labelLayer:{
+          label: '卫星地图注记',
+          id: 'tencent-satellite-label',
+          mapType: 'tencent',
+          layerType: 'tencenttiles',
+          projection: 'GCJ-02',
+          subdomain: [0,1, 2, 3],
+          url : 'https://rt{0-3}.map.gtimg.com/tile?z={z}&x={x}&y={y}&type=vector&styleid=2',
+        }
+      },
+      {
+        label: '电子地图(深色)',
+        value: 'tencent-terrain-dark',
+        mapType: 'tencent',
+        layerType: 'tencenttiles',
+        projection: 'GCJ-02',
+        subdomain: [0,1, 2, 3],
+        url:"https://rt{0-3}.map.gtimg.com/tile?z={z}&x={x}&y={y}&styleid=4"
+      },
+      {
+        label: '地形图',
+        value: 'tencent-terrain',
+        mapType: 'tencent',
+        layerType: 'tencenttiles',
+        projection: 'GCJ-02',
+        subdomain: [0,1, 2, 3],
+        url:'https://p{0-3}.map.gtimg.com/demTiles/{z}/{m}/{n}/{x}_{y}.jpg',
+        labelLayer:{
+          label: '地形图注记',
+          id: 'tencent-terrain-label',
+          mapType: 'tencent',
+          layerType: 'tencenttiles',
+          projection: 'GCJ-02',
+          subdomain: [0,1, 2, 3],
+          url : 'https://rt{0-3}.map.gtimg.com/tile?z={z}&x={x}&y={y}&type=vector&styleid=2',
+        }
+      },
+    ],
   },
   {
     label: '天地图',

@@ -5,7 +5,7 @@ import { join } from '@tauri-apps/api/path';
 import { writeFile, mkdir, exists,remove as removeFile } from "@tauri-apps/plugin-fs";
 import { nanoid } from 'nanoid';
 import { getTdtKey,getDownloadLimit } from '@/plugins/store/Setting'
-import { isTdt,longlat2tile } from '@/plugins/map/Utils'
+import { isTdt,isTencent } from '@/plugins/map/Utils'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 import { getPercentage } from '@/utils/index'
 import { RandomUserAgent } from '@/utils/userAgent';
@@ -26,6 +26,7 @@ export default class DownloadTiles {
   private taskInfo: any;
   private downLayer: any;
   private downUrl:string;
+  private isTencentMap:boolean;
   private successCallback: Function;
   private failCallback: Function;
   private longlat2tile:Function;
@@ -40,6 +41,7 @@ export default class DownloadTiles {
     if(isTdt(this.downLayer.mapType)){
       this.downUrl += (await getTdtKey())
     }
+    this.isTencentMap = isTencent(this.downLayer.mapType);
   }
   async start(){
     this.setStatus('downloading');
@@ -232,18 +234,22 @@ export default class DownloadTiles {
     return {saveDir,filename,savePath:await join(saveDir, filename)};
   }
   private async getTileUrl(x:any, y:any, z:any){
-    let url = this.downUrl.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+    let url = this.downUrl
+    if(this.isTencentMap){
+      y = Math.pow(2, z) - 1 - y
+      const m = Math.floor(x / 16.0);
+      const n = Math.floor(y / 16.0);  
+      url = url.replace('{m}', m).replace('{n}', n);
+    }
+    url = url.replace('{z}', z).replace('{x}', x).replace('{y}', y);
     if(this.downLayer.subdomain && this.downLayer.subdomain.length>0){
-      const subdomains = this.downLayer.subdomain[this.randomNum(0, this.downLayer.subdomain.length - 1)];
+      var hash = (x << z) + y
+      var index = hash % this.downLayer.subdomain.length
+      index = index < 0 ? index + this.downLayer.subdomain.length : index
+      const subdomains = this.downLayer.subdomain[index];
       url = url.replace(/\{\d+-\d+\}/, subdomains);
     }
     return url
   }
-
-
-  private randomNum(max:number,min:number){ 
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
 
 }
