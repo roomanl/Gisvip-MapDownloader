@@ -9,6 +9,7 @@ import OverviewMap from 'ol/control/OverviewMap';
 import MousePosition from 'ol/control/MousePosition';
 import ZoomSlider from 'ol/control/ZoomSlider';
 import {createStringXY} from 'ol/coordinate'
+import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
 import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
 import { getTdtKey } from '@/utils/settingStore'
@@ -164,6 +165,21 @@ export default class OlMap {
                 this.map.removeLayer(lay)
             }
         }
+    }
+
+    getArea(polygon: any){
+        return getArea(polygon,{projection:this.mapView.getProjection()})
+        
+    }
+    formatArea(polygon: any){
+        const area = this.getArea(polygon);
+        let output;
+        if (area > 10000) {
+            output = Math.round((area / 1000000) * 100) / 100 + ' ' + '平方千米';
+        } else {
+            output = Math.round(area * 100) / 100 + ' ' + '平方米';
+        }
+        return output;
     }
     setCenter(center: any){
         // console.log(center)

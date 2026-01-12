@@ -3,7 +3,7 @@
         <el-form  label-width="auto" label-position="top">
             <el-form-item label="下载范围">
                 <el-input
-                    :model-value="downConfStore.downloadExtent.join(',')"
+                    :model-value="downConfStore.downExtent.join(',')"
                     style="width: 100%"
                     :rows="2"
                     type="textarea"
@@ -11,41 +11,42 @@
                     resize="none"
                 />
             </el-form-item>
-            <el-form-item :label="getdownloadZoomTitle">
-                <el-slider v-model="downConfStore.downloadZoom" range show-stops size="small" :max="19" :min="1" />
+            <el-form-item :label="getdownZoomTitle">
+                <el-slider v-model="downConfStore.downZoom" range show-stops size="small" :max="19" :min="1" />
             </el-form-item>
             <el-form-item label="瓦片格式">
-                <el-select v-model="downConfStore.tilesType">
+                <el-select v-model="downConfStore.downTilesType">
                     <el-option label="jpg" value="jpg"/>
                     <el-option label="png" value="png"/>
                 </el-select>
             </el-form-item>
             <el-form-item label="下载路径">
-                <el-input v-model="downConfStore.downloadPath" readonly @click="selectPath" />
+                <el-input v-model="downConfStore.downPath" readonly @click="selectPath" />
             </el-form-item>
         </el-form>
-        <el-button  size="small" round style="width:100%" @click="download" >下 载</el-button>
+        <el-button type="info" round plain style="width:100%" @click="download" >下 载</el-button>
+
+        <el-dialog
+            v-model="dialogVisible"
+            title="下载信息"
+            width="70%"
+            append-to-body
+            lock-scroll
+            align-center
+            :show-close="false"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false">
+            <span>This is a message</span>
+            <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">
+                下 载
+                </el-button>
+            </div>
+            </template>
+        </el-dialog>
     </div>
-    <el-dialog
-        v-model="dialogVisible"
-        title="下载信息"
-        width="70%"
-        append-to-body
-        lock-scroll
-        align-center
-        :show-close="false"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false">
-        <span>This is a message</span>
-        <template #footer>
-        <div class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">
-            下 载
-            </el-button>
-        </div>
-        </template>
-    </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -57,7 +58,7 @@
 
     const downConfStore = useDownConfStore()
     const downloadMapManager = new DownloadMapManager()
-    const getdownloadZoomTitle =  computed(() => '下载层级（'+downConfStore.downloadZoom.join('-')+'）');
+    const getdownZoomTitle =  computed(() => '下载层级（'+downConfStore.downZoom.join('-')+'）');
     const dialogVisible = ref(false)
 
     const download = async () => {
@@ -74,12 +75,12 @@
         })
         // console.log(path);
         if (!path) return
-        downConfStore.downloadPath = path
+        downConfStore.downPath = path
         setDownloadPath(path)
     }
 
     const init = async () => {
-        downConfStore.downloadPath = await getDownloadPath()
+        downConfStore.downPath = await getDownloadPath()
     }
 
     onMounted(() => {

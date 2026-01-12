@@ -13,13 +13,10 @@
 
 <script setup lang="ts">
     import axios from 'axios';
-    import { getCurrentInstance, onMounted, ref } from 'vue';
+    import { onMounted, ref } from 'vue';
     import { getChinaAreasTree } from '@/utils';
     import {mapManager} from '@/maplib/MapManager';
-    import { useDownConfStore } from '@/store/modules/downConf'
 
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    const downConfStore = useDownConfStore();
     const axiosHttp = axios.create({
         baseURL: 'https://geo.datav.aliyun.com/areas_v3/bound/',
         timeout: 60000,
@@ -48,10 +45,9 @@
     }
 
     const nodeClick = (data: any,node:any) => { 
-        console.log(data);
-        mapManager.selectArea(data);
-        downConfStore.downArea = {area:data,parent:node.parent.data};
-        proxy?.$EventBus.emit('switch-area', {area:data,parent:node.parent.data});
+        //console.log(data);
+        mapManager.selectArea(data,node.parent.data);
+       
     }
 
     const init = async () => { 
@@ -65,6 +61,6 @@
 
 <style lang="scss" scoped>
 .scrollbar{
-    height : calc(100vh - 70px);
+    height : calc(100vh - 120px);
 }
 </style>

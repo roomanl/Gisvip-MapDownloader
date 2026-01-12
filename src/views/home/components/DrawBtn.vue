@@ -9,14 +9,9 @@
 </template>
 
 <script setup lang="ts">
-    import { getCurrentInstance, ref } from 'vue';
-    import { toStringXY} from 'ol/coordinate'
+    import { ref } from 'vue';
     import {mapManager} from '@/maplib/MapManager';
-    import { useDownConfStore } from '@/store/modules/downConf'
 
-
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    const downConfStore = useDownConfStore();
     const showGridLayer = ref(false);
     const addGridLayer = () => {
         if (!showGridLayer.value) {
@@ -29,22 +24,10 @@
     };
 
     const startDraw = () => {
-        mapManager.drawTool.clear();
-        mapManager.drawTool.startDraw({
-            type: 'Box',
-            drawEnd: (evt: any) => {
-                const extent = evt.feature.getGeometry().getExtent().map(num => parseFloat(num.toFixed(6)));
-                downConfStore.downloadExtent = extent;
-                const evtData = {area:{name:'自定义区域'},parent:{}};
-                downConfStore.downArea = evtData;
-                proxy?.$EventBus.emit('switch-area', evtData);
-            }
-        });
+        mapManager.drawExtent();
     };
     const clean = () => {
-        mapManager.drawTool.clear();
-        downConfStore.downloadExtent = []
-        proxy?.$EventBus.emit('switch-area', {area:{},parent:{}});
+        mapManager.clearExtent();
     };
 
 </script>

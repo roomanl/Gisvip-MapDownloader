@@ -1,47 +1,55 @@
 <template>
     <div class="top-tile">
-        <div class="title">{{title}}</div>
-        <div class="areaname">
+        <div class="title inline">{{mapName}}</div>
+        <div class="cityname inline">
             <el-divider direction="vertical" />
-            <span v-if="areaName">{{ areaName }}</span>
-            <span v-else>未选择下载区域</span>
+            {{ cityName }}
+        </div>
+        <div class="inline">
+            <el-divider direction="vertical" />
+            {{ cityAera }}
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, onBeforeUnmount, ref } from 'vue';
+import { computed } from 'vue';
+import { useDownConfStore } from '@/store/modules/downConf'
 
+    const downConfStore = useDownConfStore();
 
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    const title = ref('');
-    const areaName = ref('');
-
-    proxy?.$EventBus.on('switch-map', ({layer,parent})=>{
-        // console.log(parent)
-        title.value = parent.label+' - '+layer.label
+    const mapName = computed(()=>{
+        if(!downConfStore.downLayer){
+            return '未选择地图'
+        }
+        return downConfStore.downLayer.parent.label+' - '+ downConfStore.downLayer.layer.label
     });
-
-    proxy?.$EventBus.on('switch-area', ({area,parent})=>{
+    const cityName = computed(()=>{
+        if(!downConfStore.downArea){
+            return '未选择下载区域'
+        }
+        const {city,parentCity} = downConfStore.downArea
         const names = []
-        if(parent.name){
-            names.push(parent.name);
+        if(parentCity.name){
+            names.push(parentCity.name);
         }
-        if(area.name){
-            names.push( area.name);
+        if(city.name){
+            names.push( city.name);
         }
-        areaName.value=names.join(' - ')
+        return names.join(' - ')
     });
-
-    onBeforeUnmount(()=>{
-        proxy?.$EventBus.off('switch-map');
-        proxy?.$EventBus.off('switch-area');
+    const cityAera = computed(()=>{
+        if(!downConfStore.downArea){
+            return ''
+        }
+        return downConfStore.downArea.area
     })
+
 
 </script>
 
 <style scoped>
-.title,.areaname{
+.inline{
     display: inline;
 }
 </style>

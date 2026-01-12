@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import{ref, onMounted } from 'vue'
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { ElMessageBox } from 'element-plus'
 
 const appWindow = getCurrentWindow();
 const isMaximized = ref(false)
@@ -39,11 +40,20 @@ const toggleMaximize = async () => {
     }
 }
 const close = async () => {
-  // 可以在这里添加关闭前的确认逻辑
-  const confirmed = window.confirm('确定要关闭应用吗？')
-  if (confirmed) {
-    await appWindow.close()
-  }
+   ElMessageBox.confirm(
+    '确定要关闭应用吗？',
+    '提示',
+    {
+      confirmButtonText: '确 定',
+      cancelButtonText: '取 消',
+      type: 'warning',
+      showClose:false,
+      closeOnClickModal: false
+    }
+  ).then(() => {
+    appWindow.close()
+  }).catch(() => {})
+
 }
 onMounted(() => {
     // createTray()
@@ -65,7 +75,7 @@ onMounted(() => {
     padding: 0 20px;
     height: 30px;
     max-height: 30px;
-    padding-bottom: 10px;
+    /* padding-bottom: 10px; */
     border-bottom: 1px solid var(--el-menu-border-color);
     -webkit-app-region: drag;
 }

@@ -1,13 +1,10 @@
 <template>
     <div>
-        <Teleport defer to="#layout-leftmenu-subpanel">
-            <LayerList v-show="appStore.selectLeftMenu.key=='layers'" />
-            <DownloadMapSetting v-show="appStore.selectLeftMenu.key=='download'" />
-            <ChinaAreasTree v-show="appStore.selectLeftMenu.key=='downloadExtent'" />
-            <MapKeySetting v-show="appStore.selectLeftMenu.key=='mapkey'" />
-        </Teleport>
         <Teleport defer to="#layout-toptitle-subpanel">
-            <TopTile v-if="appStore.selectLeftMenu.type=='top'" />
+            <TopTile v-if="appStore.selectLeftMenu.key=='home'" />
+        </Teleport>
+         <Teleport defer to="#layout-leftmenu-subpanel">
+            <LeftPanel v-show="appStore.selectLeftMenu.key=='home'" />
         </Teleport>
         <div>
             <OlMap>
@@ -21,14 +18,10 @@
     </div>
 </template>
 
-<script setup lang="ts">
-    import { getCurrentInstance, ref,onBeforeUnmount } from 'vue'
+<script setup lang="ts" name="Home">
+import { getCurrentInstance, ref,onBeforeUnmount } from 'vue'
 import { useAppStore } from '@/store/modules/app'
-import ILeftMenu from '@/types/ILeftMenu';
-import MapKeySetting from '@/components/MapKeySetting'
-import ChinaAreasTree from '@/components/ChinaAreasTree'
-import DownloadMapSetting from '@/components/DownloadMapSetting'
-import LayerList from '@/components/LayerList'
+import LeftPanel from './components/LeftPanel'
 import TopTile from './components/TopTile.vue';
 import DrawBtn from './components/DrawBtn.vue';
 import OlMap from '@/components/OlMap'

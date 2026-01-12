@@ -12,15 +12,12 @@
 </template>
 
 <script setup lang="ts">
-    import { getCurrentInstance, onMounted, ref } from 'vue';
+    import { onMounted, ref } from 'vue';
     import { ElNotification } from 'element-plus'
     import { layerList } from '@/maplib/LayerList';
     import {mapManager} from '@/maplib/MapManager';
     import { getTdtKey } from '@/utils/settingStore'
-    import { useDownConfStore } from '@/store/modules/downConf'
 
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    const downConfStore = useDownConfStore();
     const props = {
         label: 'label',
     }
@@ -35,16 +32,14 @@
             if(!tdtKey) {
                 ElNotification({
                     title: '提示',
-                    message: '请先设置天地图key',
+                    message: '请先在设置里配置天地图key',
                     type: 'warning',
                     duration: 2000
                 })
                 return;
             }
         }
-        mapManager.loadBaseMap(data);
-        downConfStore.downLayer = {layer:data,parent:node.parent.data};
-        proxy?.$EventBus.emit('switch-map', {layer:data,parent:node.parent.data});
+        mapManager.loadBaseMap(data,node.parent.data);
     }
 
     const init = async () => { 

@@ -17,16 +17,17 @@ class MapManager {
         this.drawTool = new DrawTool({
             map: this.olMap.getMap(),
             mapView: this.olMap.getMapView(),
-            layerType: 'downloadExtent',
+            layerType: 'downExtent',
             layerIndex: 99
         });
     }
-    loadBaseMap(layer: any){
+    loadBaseMap(layer: any,parentData:any){
         this.olMap.loadBaseMap(layer);
+        this.downConfStore.downLayer = {layer:layer,parent:parentData};
     }
-    selectArea(area:any){
+    selectArea(city:any,parentCity:any){
         this.drawTool.clear()
-        const coordinates = area.geometry.type=='MultiPolygon'?area.geometry.coordinates:[area.geometry.coordinates];
+        const coordinates = city.geometry.type=='MultiPolygon'?city.geometry.coordinates:[city.geometry.coordinates];
         let feature = this.drawTool.drawMultiPoly(coordinates)
         const extent = feature.getGeometry().getExtent();
         this.olMap.getMapView().fit(extent, {
@@ -34,8 +35,33 @@ class MapManager {
             padding: [100, 100, 100, 100],
             maxZoom: 15
         });
-        this.downConfStore.downloadExtent = extent;
+        this.downConfStore.downExtent = extent;
+        this.downConfStore.downArea = {
+            city:city,
+            parentCity:parentCity,
+            area:this.olMap.formatArea(feature.getGeometry())
+        };
         // this.olMap.setCenter(area.center);
+    }
+    drawExtent(){ 
+        this.drawTool.clear();
+        this.drawTool.startDraw({
+            type: 'Box',
+            drawEnd: (evt: any) => {
+                const extent = evt.feature.getGeometry().getExtent().map(num => parseFloat(num.toFixed(6)));
+                this.downConfStore.downExtent = extent;
+                this.downConfStore.downArea = {
+                    city:{name:'自定义区域'},
+                    parentCity:{},
+                    area:this.olMap.formatArea(evt.feature.getGeometry())
+                };
+            }
+        });
+    }
+    clearExtent(){ 
+        this.drawTool.clear();
+        this.downConfStore.downExtent = [];
+        this.downConfStore.downArea = undefined;
     }
 }
 
