@@ -1,8 +1,12 @@
 <template>
     <div class="header-container">
+        <div class="left-container"></div>
         <div class="right-container">
             <el-button text plain icon="SemiSelect" @click="minimize" />
-            <el-button text plain icon="FullScreen" @click="toggleMaximize" />
+            <el-button text plain @click="toggleMaximize">
+                <svg-icon v-if="isMaximized" icon-class="minimize" class="svg-icon" />
+                <svg-icon v-else icon-class="maximize" class="svg-icon"/>
+            </el-button>
             <el-button text plain icon="CloseBold" @click.stop="close" />
         </div>
     </div>
@@ -14,6 +18,7 @@
 <script setup lang="ts">
 import{ref, onMounted } from 'vue'
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { exitApp } from '@/utils/tauriApi';
 import { ElMessageBox } from 'element-plus'
 
 const appWindow = getCurrentWindow();
@@ -40,7 +45,7 @@ const toggleMaximize = async () => {
     }
 }
 const close = async () => {
-  console.log('close')
+//   console.log('close')
    ElMessageBox.confirm(
     '确定要关闭应用吗？',
     '提示',
@@ -53,7 +58,13 @@ const close = async () => {
       closeOnClickModal: false
     }
   ).then(() => {
-    appWindow.close()
+    try {
+        exitApp()
+    } catch (error) {
+      console.log(error)
+      appWindow.close()
+    }
+    
   }).catch(() => {})
 
 }
@@ -67,11 +78,16 @@ onMounted(() => {
 .header-container{
     position: relative;
     height: 30px;
+    display: flex;
+}
+.left-container{
+    flex: 1;
     -webkit-app-region: drag;
+
 }
 .right-container{
-    position: absolute;
-    right: 0;
+    /* position: absolute;
+    right: 0; */
 }
 .top-title{
     padding: 0 20px;
@@ -80,5 +96,9 @@ onMounted(() => {
     /* padding-bottom: 10px; */
     border-bottom: 1px solid var(--el-menu-border-color);
     -webkit-app-region: drag;
+}
+.svg-icon{
+    width: 1rem !important;
+    height: 1rem !important;
 }
 </style>
