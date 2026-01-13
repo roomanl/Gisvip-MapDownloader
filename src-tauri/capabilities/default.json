@@ -32,6 +32,9 @@
     "fs:allow-read-text-file-lines",
     "fs:allow-write-text-file",
     "fs:allow-resource-read-recursive",
-    "dialog:default"
+    "dialog:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:default"
   ]
 }

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import 'ol/ol.css'
-import {mapManager} from '@/maplib/MapManager';
+import {mapManager} from '@/plugins/map/mapManager';
 
 const rootmap = ref<HTMLElement | null>(null);
 

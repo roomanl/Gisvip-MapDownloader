@@ -19,18 +19,15 @@
 </template>
 
 <script setup lang="ts" name="Download">
-    import { getCurrentInstance,ref } from 'vue';
+    import { ref } from 'vue';
     import { useAppStore } from '@/store/modules/app'
     import LeftPanel from './components/LeftPanel.vue';
 
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
     const appStore = useAppStore()
     const titleText = ref('下载管理')
 
     const goHome = () => {
-        const homeMenu = appStore.homeMenu
-        appStore.selectLeftMenu = homeMenu
-        proxy?.$router.push(homeMenu.router)
+        appStore.openViewByIndex(0)
     }
 
     

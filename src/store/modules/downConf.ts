@@ -8,8 +8,35 @@ export const useDownConfStore = defineStore('downConf-store', () => {
     const downTilesType = ref('jpg')
     const downPath = ref('')
     const downCoordinates = ref([])
-    const downLayer = undefined
-    const downArea = undefined
+    const downLayer = ref(undefined)
+    const downArea = ref(undefined)
+
+    const mapName = computed(()=>{
+        if(!downLayer.value){
+            return '未选择地图'
+        }
+        return downLayer.value.parent.label+' - '+ downLayer.value.layer.label
+    })
+    const cityName = computed(()=>{
+        if(!downArea.value){
+            return '未选择下载区域'
+        }
+        const {city,parentCity} = downArea.value
+        const names = []
+        if(parentCity.name){
+            names.push(parentCity.name);
+        }
+        if(city.name){
+            names.push( city.name);
+        }
+        return names.join(' - ')
+    })
+    const cityArea = computed(()=>{
+        if(!downArea.value){
+            return ''
+        }
+        return downArea.value.area
+    })
   
     return {
         downExtent,
@@ -18,6 +45,9 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         downPath,
         downCoordinates,
         downLayer,
-        downArea
+        downArea,
+        mapName,
+        cityName,
+        cityArea
     };
 });

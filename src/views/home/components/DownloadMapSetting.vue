@@ -25,47 +25,22 @@
             </el-form-item>
         </el-form>
         <el-button type="info" round plain style="width:100%" @click="download" >下 载</el-button>
-
-        <el-dialog
-            v-model="dialogVisible"
-            title="下载信息"
-            width="70%"
-            append-to-body
-            lock-scroll
-            align-center
-            :show-close="false"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false">
-            <span>This is a message</span>
-            <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">
-                下 载
-                </el-button>
-            </div>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
     import { computed, ref,onMounted } from 'vue'
     import { open as openDirDialog } from '@tauri-apps/plugin-dialog';
-    import { getDownloadPath ,setDownloadPath } from '@/utils/settingStore'
-    import DownloadMapManager from '@/maplib/DownloadMapManager'
+    import { getDownloadPath ,setDownloadPath } from '@/plugins/store/Setting'
+    import DownloadMapManager from '@/plugins/map/DownloadMapManager'
     import { useDownConfStore } from '@/store/modules/downConf'
 
     const downConfStore = useDownConfStore()
     const downloadMapManager = new DownloadMapManager()
     const getdownZoomTitle =  computed(() => '下载层级（'+downConfStore.downZoom.join('-')+'）');
-    const dialogVisible = ref(false)
 
     const download = async () => {
-        if(!await downloadMapManager.checkDownConf()){
-            return
-        }
-        dialogVisible.value = true
+        downloadMapManager.startDownload()
     }
 
     const selectPath = async () => {

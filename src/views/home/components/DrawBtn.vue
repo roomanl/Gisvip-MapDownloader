@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
-    import {mapManager} from '@/maplib/MapManager';
+    import {mapManager} from '@/plugins/map/MapManager';
 
     const showGridLayer = ref(false);
     const addGridLayer = () => {
