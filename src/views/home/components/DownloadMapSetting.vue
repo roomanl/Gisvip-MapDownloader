@@ -24,7 +24,7 @@
                 <el-input v-model="downConfStore.downPath" readonly @click="selectPath" />
             </el-form-item>
         </el-form>
-        <el-button type="info" round plain style="width:100%" @click="download" >下 载</el-button>
+        <el-button type="info" round plain style="width:100%" @click="download" >添加下载任务</el-button>
     </div>
 </template>
 
@@ -32,15 +32,14 @@
     import { computed, ref,onMounted } from 'vue'
     import { open as openDirDialog } from '@tauri-apps/plugin-dialog';
     import { getDownloadPath ,setDownloadPath } from '@/plugins/store/Setting'
-    import DownloadMapManager from '@/plugins/map/DownloadMapManager'
+    import { downloadMapManager } from '@/plugins/map/DownloadMapManager'
     import { useDownConfStore } from '@/store/modules/downConf'
 
     const downConfStore = useDownConfStore()
-    const downloadMapManager = new DownloadMapManager()
     const getdownZoomTitle =  computed(() => '下载层级（'+downConfStore.downZoom.join('-')+'）');
 
     const download = async () => {
-        downloadMapManager.startDownload()
+        downloadMapManager.addDownloadTask()
     }
 
     const selectPath = async () => {

@@ -23,15 +23,15 @@ class SQLiteManager {
                 downPath TEXT NOT NULL,
                 downUrl TEXT NOT NULL,
                 downLayer TEXT NOT NULL,
-                downStatus TEXT DEFAULT 0,
-                tileTotal TEXT NOT NULL,
-                successTotal TEXT DEFAULT 0,
+                downStatus INTEGER DEFAULT 0,
+                tileTotal INTEGER NOT NULL,
+                successTotal INTEGER DEFAULT 0,
                 createTime TEXT NOT NULL
             )
         `);
     }
     async addDownloadTask(task: any) {
-        await this.db.execute(`
+        const result = await this.db.execute(`
             INSERT INTO download_task (
                 mapName,
                 cityName,
@@ -47,15 +47,16 @@ class SQLiteManager {
             ) VALUES (?,?,?,?,?,?,?,?,?,?,?) `,
             [task.mapName,task.cityName,task.cityArea, task.downExtent, task.downZoom, task.downTilesType, task.downPath, task.downUrl, task.downLayer, task.tileTotal, task.createTime]
         );
+        return result;
     }
-    async getDownloadTask() {
-        const result = await this.db.execute(`
+    async getDownloadTasks() {
+        const result = await this.db.select(`
             SELECT * FROM download_task order by id desc
         `);
         return result;
     }
     async getDownloadTaskById(taskId: any) {
-        const result = await this.db.execute(`
+        const result = await this.db.select(`
             SELECT * FROM download_task WHERE id = ?`, 
             [taskId]
         );

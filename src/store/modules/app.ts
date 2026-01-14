@@ -16,18 +16,18 @@ export const useAppStore = defineStore('app-store', () => {
     const leftMenuPanelWidth = computed(() => {
         return selectLeftMenu.value?.subPanel?'300px':'65px'
     })
-    const openView = (path:string)=>{
+    const openView = (path:string,query:any)=>{
         const menu = leftMenu.find((item:ILeftMenu) => item.router === path)
         if(menu){
             selectLeftMenu.value = menu
-            router.push(menu.router)
+            router.push({ path: menu.router, query: query?query:{} })
         }
     }
-    const openViewByIndex = (index:number)=>{
+    const openViewByIndex = (index:number,query:any)=>{
         const menu = leftMenu[index]
         if(menu){
             selectLeftMenu.value = menu
-            router.push(menu.router)
+            router.push({ path: menu.router, query: query?query:{} })
         }
     }
 
