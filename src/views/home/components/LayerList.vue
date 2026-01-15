@@ -13,10 +13,9 @@
 
 <script setup lang="ts">
     import { onMounted, ref } from 'vue';
-    import { ElNotification } from 'element-plus'
     import { layerList } from '@/plugins/map/LayerList';
     import {mapManager} from '@/plugins/map/MapManager';
-    import { checkTdtKeyTip } from '@/utils/index'
+    import { isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
 
     const props = {
         label: 'label',
@@ -27,10 +26,8 @@
 
     const nodeClick = async(data: any,node:any) => { 
         if(!data.url) return;
-        if(data.id.includes('tdt')){
-            if(!await checkTdtKeyTip()) {
-                return;
-            }
+        if(isTdt(data.id) && !await checkTdtKeyTip()){
+            return;
         }
         mapManager.loadBaseMap(data,node.parent.data);
     }

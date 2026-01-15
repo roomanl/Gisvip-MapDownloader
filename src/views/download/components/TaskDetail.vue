@@ -41,7 +41,7 @@
             </el-form-item>
         </el-form>
         <div class="footer">
-            <el-button v-if="downTaskStore.selectTask.taskStatus=='waiting'" type="primary">开始下载</el-button>
+            <el-button v-if="downTaskStore.selectTask.taskStatus=='waiting'" type="primary" @click="startTask">开始下载</el-button>
             <el-button v-if="downTaskStore.selectTask.taskStatus=='downloading'" type="warning">暂停下载</el-button>
             <el-button v-if="downTaskStore.selectTask.taskStatus!='downloading'" type="danger" @click="deleteTask">删除任务</el-button>
         </div>
@@ -59,6 +59,9 @@
     const taskStatusText = computed(() => {
         return downloadMapManager.getTaskStatusText(downTaskStore.selectTask.taskStatus)
     })
+    const startTask = async () => {
+        downloadMapManager.startDownload(downTaskStore.selectTask)
+    }
 
     const deleteTask = async () => {
         ElMessageBox.confirm(

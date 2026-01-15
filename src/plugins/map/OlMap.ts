@@ -13,6 +13,7 @@ import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
 import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
 import { getTdtKey } from '@/plugins/store/Setting'
+import { isTdt } from '@/plugins/map/Utils'
 
 
 export default class OlMap {
@@ -142,7 +143,7 @@ export default class OlMap {
         let baseMapLayer=null
         if(layer.type=='tiles'){
             let mapUrl = layer.url
-            if(layer.id.includes('tdt')){
+            if(isTdt(layer.id)){
                 mapUrl= mapUrl + (await getTdtKey())
             }
             baseMapLayer=new TileLayer({
