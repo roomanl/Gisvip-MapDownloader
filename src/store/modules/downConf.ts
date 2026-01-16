@@ -10,6 +10,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
     const downCoordinates = ref([])
     const downLayer = ref(undefined)
     const downArea = ref(undefined)
+    const tileTotal = ref(0)
 
     const mapName = computed(()=>{
         if(!downLayer.value){
@@ -48,6 +49,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         downArea,
         mapName,
         cityName,
-        cityArea
+        cityArea,
+        tileTotal
     };
 });

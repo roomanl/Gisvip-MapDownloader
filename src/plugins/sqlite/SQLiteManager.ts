@@ -60,7 +60,7 @@ class SQLiteManager {
             SELECT * FROM download_task WHERE id = ?`, 
             [taskId]
         );
-        return result;
+        return result?.[0];
     }
     async updateDownloadStatus(taskId: any, status: any) {
         const result =await this.db.execute(`

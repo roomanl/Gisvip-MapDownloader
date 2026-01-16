@@ -12,7 +12,10 @@
                 />
             </el-form-item>
             <el-form-item :label="getdownZoomTitle">
-                <el-slider v-model="downConfStore.downZoom" range show-stops size="small" :max="19" :min="1" />
+                <el-slider v-model="downConfStore.downZoom" @change="tileTotalChange" range show-stops size="small" :max="19" :min="1" />
+            </el-form-item>
+            <el-form-item v-if="downConfStore.downExtent.length" label="瓦片数量" label-position="left">
+                {{ downConfStore.tileTotal }}
             </el-form-item>
             <el-form-item label="瓦片格式">
                 <el-select v-model="downConfStore.downTilesType">
@@ -29,10 +32,11 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, ref,onMounted } from 'vue'
+    import { computed, ref,onMounted, watch } from 'vue'
     import { open as openDirDialog } from '@tauri-apps/plugin-dialog';
     import { getDownloadPath ,setDownloadPath } from '@/plugins/store/Setting'
     import { downloadMapManager } from '@/plugins/map/DownloadMapManager'
+    import { calculateTileCount } from '@/plugins/map/Utils'
     import { useDownConfStore } from '@/store/modules/downConf'
 
     const downConfStore = useDownConfStore()
@@ -53,10 +57,17 @@
         setDownloadPath(path)
     }
 
+    const tileTotalChange = () => {
+        downConfStore.tileTotal = calculateTileCount(downConfStore.downExtent,downConfStore.downZoom)
+    }
+
     const init = async () => {
         downConfStore.downPath = await getDownloadPath()
     }
 
+    watch(() => downConfStore.downExtent,()=>{
+        tileTotalChange()
+    })
     onMounted(() => {
         init()
     })
