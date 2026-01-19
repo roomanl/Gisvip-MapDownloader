@@ -1,7 +1,7 @@
 
-const getTdtUrl = (url:string, layer:string) => {
-    const tdtUrlParams = 'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=';
-    return `${url}?LAYER=${layer}&${tdtUrlParams}`;
+const getTdtUrl = (url:string, layer:string,tilematrixset:string) => {
+    const tdtUrlParams = 'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=default&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=';
+    return `${url}?LAYER=${layer}&TILEMATRIXSET=${tilematrixset}&${tdtUrlParams}`;
   };
 
 export const layerList =[
@@ -10,45 +10,98 @@ export const layerList =[
     id: 'tdt',
     children: [
       {
-        label: '普通',
+        label: '普通(4326)',
         id: 'tdt-normal',
-        type: 'tiles',
+        mapType: 'tdt',
+        layerType: 'tiles',
         prejection: 'EPSG:4326',
-        url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/vec_c/wmts', 'vec'),
+        url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/vec_c/wmts', 'vec','c'),
         labelLayer:{
-            label: '普通',
+            label: '普通(4326)',
             id: 'tdt-normal-label',
-            type: 'tiles',
+            mapType: 'tdt',
+            layerType: 'tiles',
             prejection: 'EPSG:4326',
-            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cva_c/wmts', 'cva'),
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cva_c/wmts', 'cva','c'),
         }
       },
       {
-        label: '卫星',
+        label: '卫星(4326)',
         id: 'tdt-satellite',
-        type: 'tiles',
+        mapType: 'tdt',
+        layerType: 'tiles',
         prejection: 'EPSG:4326',
-        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/img_c/wmts', 'img'),
+        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/img_c/wmts', 'img','c'),
         labelLayer:{
-            label: '普通',
-            id: 'tdt-normal-label',
-            type: 'tiles',
+            label: '卫星注记(4326)',
+            id: 'tdt-satellite-label',
+            mapType: 'tdt',
+            layerType: 'tiles',
             prejection: 'EPSG:4326',
-            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cia_c/wmts', 'cia'),
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cia_c/wmts', 'cia','c'),
         }
       },
       {
-        label: '地形',
+        label: '地形(4326)',
         id: 'tdt-terrain',
-        type: 'tiles',
+        mapType: 'tdt',
+        layerType: 'tiles',
         prejection: 'EPSG:4326',
-        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/ter_c/wmts', 'ter'),
+        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/ter_c/wmts', 'ter','c'),
         labelLayer:{
-            label: '普通',
-            id: 'tdt-normal-label',
-            type: 'tiles',
+            label: '地形注记(4326)',
+            id: 'tdt-terrain-label',
+            mapType: 'tdt',
+            layerType: 'tiles',
             prejection: 'EPSG:4326',
-            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cta_c/wmts', 'cta'),
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cta_c/wmts', 'cta','c'),
+        }
+      },{
+        label: '普通(3857)',
+        id: 'tdt-normal',
+        mapType: 'tdt',
+        layerType: 'tiles',
+        prejection: 'EPSG:3857',
+        url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/vec_w/wmts', 'vec','w'),
+        labelLayer:{
+            label: '普通(3857)',
+            id: 'tdt-normal-label',
+            mapType: 'tdt',
+            layerType: 'tiles',
+            prejection: 'EPSG:3857',
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cva_w/wmts', 'cva','w'),
+        }
+      },
+      {
+        label: '卫星(3857)',
+        id: 'tdt-satellite',
+        mapType: 'tdt',
+        layerType: 'tiles',
+        prejection: 'EPSG:3857',
+        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/img_w/wmts', 'img','w'),
+        labelLayer:{
+            label: '卫星注记(3857)',
+            id: 'tdt-satellite-label',
+            mapType: 'tdt',
+            layerType: 'tiles',
+            prejection: 'EPSG:3857',
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cia_w/wmts', 'cia','w'),
+        }
+      },
+      {
+        label: '地形(3857)',
+        id: 'tdt-terrain',
+        mapType: 'tdt',
+        layerType: 'tiles',
+        prejection: 'EPSG:3857',
+        url: getTdtUrl('https://t{0-7}.tianditu.gov.cn/ter_w/wmts', 'ter','w'),
+        labelLayer:{
+            label: '地形注记(3857)',
+            id: 'tdt-terrain-label',
+            mapType: 'tdt',
+            layerType: 'tiles',
+            prejection: 'EPSG:3857',
+            url :getTdtUrl('https://t{0-7}.tianditu.gov.cn/cta_w/wmts', 'cta','w'),
         }
       },
     ],

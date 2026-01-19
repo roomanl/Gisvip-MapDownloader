@@ -12,6 +12,7 @@ import {createStringXY} from 'ol/coordinate'
 import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
 import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
+import {get as getProjection,transform} from 'ol/proj.js';
 import { getTdtKey } from '@/plugins/store/Setting'
 import { isTdt } from '@/plugins/map/Utils'
 
@@ -22,10 +23,13 @@ export default class OlMap {
     private labelLayer: any;
     private gridLayer:any;
     private graticuleLayer: any;
-    private mapView: any;
+    private mapView4326: any;
+    private mapView3857: any;
     private map: any;
     private overviewMap: OverviewMap;
-    private baseProjection = 'EPSG:4326';
+    private mousePosition:MousePosition;
+    private baseProjection = 'EPSG:3857';
+    private baseCenter: any = [116.405285, 39.904989]
 
     constructor(options: any) {
         this.opacity = 1;
@@ -36,28 +40,26 @@ export default class OlMap {
 
 
     initMap(mapTarget: any) {
-        this.mapView = new View({
-            projection: this.baseProjection,
+        this.mapView4326 = new View({
+            projection: 'EPSG:4326',
             zoom: 1,
-            maxZoom:19
+            maxZoom:18
+        })
+        this.mapView3857 = new View({
+            projection: 'EPSG:3857',
+            zoom: 1,
+            maxZoom:18
         })
         this.map = new Map({
             target: mapTarget,
-            view: this.mapView
+            // view: this.mapView4326
         })
         this.initControl()
-        this.initTileDebug()
         this.initGraticule()
-        this.setZoom(10)
-        this.setCenter([116.405285, 39.904989])
     }
     initControl(){
         this.map.addControl(new ScaleLine())
         this.map.addControl(new ZoomSlider())
-        this.map.addControl(new MousePosition({
-            coordinateFormat:createStringXY(4),
-            projection: this.mapView.getProjection()
-        }));
     }
     addOverviewMap(layer: any){
         if(this.overviewMap){
@@ -70,6 +72,16 @@ export default class OlMap {
         })
         this.map.addControl(this.overviewMap)
         // console.log(this.overviewMap)
+    }
+    addMousePosition(){
+        if(this.mousePosition){
+            this.map.removeControl(this.mousePosition)
+        }
+        this.mousePosition=new MousePosition({
+            coordinateFormat:createStringXY(4),
+            projection: this.getMapView().getProjection()
+        })
+        this.map.addControl(this.mousePosition);
     }
 
     initGraticule(){ 
@@ -91,16 +103,6 @@ export default class OlMap {
         if(this.graticuleLayer)
             this.map.removeLayer(this.graticuleLayer)
     }
-
-    initTileDebug(){
-        this.gridLayer=new TileLayer({
-            source:new TileDebug({
-                projection:this.mapView.getProjection(),
-                wrapX:false,
-                template:'(x,y,z)({x},{y},{z})'
-            })
-        })
-    }
     addGridLayer(){
         this.map.addLayer(this.gridLayer)
     }
@@ -108,27 +110,34 @@ export default class OlMap {
         if(this.gridLayer)
             this.map.removeLayer(this.gridLayer)
     }
+    switchMapView(layer: any){
+        this.map.getLayers().clear();
+        let center = this.getMapView().getCenter()
+        let zoom = this.getMapView().getZoom()
+        zoom = zoom?zoom:10
+        if(!center){
+            center  = this.transformCoordinates(this.baseCenter,'EPSG:4326',layer.prejection)
+        }else{
+            center = this.transformCoordinates(center,this.getMapView().getProjection(),layer.prejection)
+        }
+        if(layer.prejection.includes('4326')){
+            this.map.setView(this.mapView4326)
+        }else if(layer.prejection.includes('3857')){
+            this.map.setView(this.mapView3857)
+        }
+        this.setCenter(center)
+        this.setZoom(zoom)
+        this.addMousePosition()
+    }
 
     async loadBaseMap(layer: any){
         // console.log(layer)
-        if(this.baseMapLayer){
-            this.map.removeLayer(this.baseMapLayer);
-            this.baseMapLayer=null
-        }
-        if(this.labelLayer){
-            this.map.removeLayer(this.labelLayer);
-            this.labelLayer=null
-        }
+        this.switchMapView(layer)
         this.baseMapLayer=await this.getLayer(layer)
         if(layer.labelLayer){
             this.labelLayer=await this.getLayer(layer.labelLayer)
         }
-        if(layer.center){
-           this.mapView.setCenter(layer.center)
-        }
-        if(layer.zoom){
-            this.mapView.setZoom(layer.zoom)
-        }
+        // console.log(this.map)
         var layersArray = this.map.getLayers();
         layersArray.insertAt(0,this.baseMapLayer);
         if(this.labelLayer){
@@ -141,9 +150,9 @@ export default class OlMap {
 
     async getLayer(layer: any){
         let baseMapLayer=null
-        if(layer.type=='tiles'){
+        if(layer.layerType=='tiles'){
             let mapUrl = layer.url
-            if(isTdt(layer.id)){
+            if(isTdt(layer.mapType)){
                 mapUrl= mapUrl + (await getTdtKey())
             }
             baseMapLayer=new TileLayer({
@@ -158,18 +167,9 @@ export default class OlMap {
         }
         return baseMapLayer
     }
-    removeLayer(mapId: any){
-        const layersArray = this.map.getLayers();
-        for(let i=0;i<layersArray.getLength();i++){
-            const lay=layersArray.item(i)
-            if(lay.get('id')==mapId){
-                this.map.removeLayer(lay)
-            }
-        }
-    }
 
     getArea(polygon: any){
-        return getArea(polygon,{projection:this.mapView.getProjection()})
+        return getArea(polygon,{projection:this.getMapView().getProjection()})
         
     }
     formatArea(polygon: any){
@@ -182,17 +182,22 @@ export default class OlMap {
         }
         return output;
     }
+    transformCoordinates(coordinates: any,source: any,destination:any){
+        // console.log(coordinates,source,destination)
+        return transform(coordinates,source,destination)
+    }
     setCenter(center: any){
         center[0]=parseFloat(center[0])
         center[1]=parseFloat(center[1])
-        this.mapView.setCenter(center)
+        this.getMapView().setCenter(center)
+        // console.log(center,this.getMapView().getCenter())
     }
     setCenterByExtent(extent: any){
         const center=getCenter(extent)
-        this.mapView.setCenter(center)
+        this.getMapView().setCenter(center)
     }
     setZoom(zoom: any){
-        this.mapView.setZoom(zoom)
+        this.getMapView().setZoom(zoom)
     }
     setBaseOpacity(opacity: any){
         this.opacity=opacity
@@ -208,7 +213,7 @@ export default class OlMap {
         return this.map
     }
     getMapView(){
-        return this.mapView
+        return this.map.getView()
     }
     getBaseLayer(){
         return this.baseMapLayer

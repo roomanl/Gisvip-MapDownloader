@@ -15,8 +15,7 @@ class MapManager {
         this.olMap = new OlMap({});
         this.olMap.initMap(mapTarget);
         this.drawTool = new DrawTool({
-            map: this.olMap.getMap(),
-            mapView: this.olMap.getMapView(),
+            map: this.olMap,
             layerType: 'downExtent',
             layerIndex: 99
         });
@@ -26,7 +25,6 @@ class MapManager {
         this.downConfStore.downLayer = {layer:layer,parent:parentData};
     }
     selectArea(city:any,parentCity:any){
-        this.drawTool.clear()
         const coordinates = city.geometry.type=='MultiPolygon'?city.geometry.coordinates:[city.geometry.coordinates];
         let feature = this.drawTool.drawMultiPoly(coordinates)
         const extent = feature.getGeometry().getExtent();

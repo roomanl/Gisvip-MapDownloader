@@ -43,7 +43,7 @@ class DownloadMapManager {
         return true
     }
     async checkTdtKey(downLayer:any) { 
-        if(isTdt(downLayer.id) && !await checkTdtKeyTip()){
+        if(isTdt(downLayer.mapType) && !await checkTdtKeyTip()){
             return false
         }
         return true

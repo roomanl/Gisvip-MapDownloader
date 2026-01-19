@@ -12,7 +12,7 @@
                 />
             </el-form-item>
             <el-form-item :label="getdownZoomTitle">
-                <el-slider v-model="downConfStore.downZoom" @change="tileTotalChange" range show-stops size="small" :max="19" :min="1" />
+                <el-slider v-model="downConfStore.downZoom" @change="tileTotalChange" range show-stops size="small" :max="18" :min="1" />
             </el-form-item>
             <el-form-item v-if="downConfStore.downExtent.length" label="瓦片数量" label-position="left">
                 {{ downConfStore.tileTotal }}

@@ -15,7 +15,7 @@ type TaskStatus = 'pending' | 'downloading' | 'paused' | 'completed' | 'error' |
 export default class DownloadTiles {
   private tasks: Map<string, any> = new Map();
   private activeDownloads: Set<string> = new Set();
-  private concurrentLimit: number = 3;
+  private concurrentLimit: number = 1;
   private maxRetryCount: number = 5;
   private retryCount: number = 0;
   private queue: string[] = [];
@@ -33,6 +33,7 @@ export default class DownloadTiles {
     this.taskInfo.successTotal = 0;
     const [minZoom, maxZoom] = JSON.parse(this.taskInfo.downZoom);
     const extent = JSON.parse(this.taskInfo.downExtent);
+    const [minLng, minLat, maxLng, maxLat] = extent;
     for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
       const {startX,endX,startY,endY} = startXYAndendXy(extent,zoom);
       for (let x = startX; x <= endX; x++) {
@@ -212,7 +213,7 @@ export default class DownloadTiles {
   private async getTileUrl(x:any, y:any, z:any){
     const downLayer = JSON.parse(this.taskInfo.downLayer);
     let url = downLayer.url.replace('{z}', z).replace('{x}', x).replace('{y}', y);
-    if(isTdt(downLayer.id)){
+    if(isTdt(downLayer.mapType)){
       url=url.replace('{0-7}', this.randomNum(0,7))
       url=url+ (await getTdtKey())
     }

@@ -10,8 +10,7 @@ import olDraw from 'ol/interaction/Draw'
 import {createBox} from 'ol/interaction/Draw'
 export default class OlMap {
     private option: any;
-    private mapView: any;
-    private map: any;
+    private olMap: any;
     private layerType: any;
     private layerIndex: any;
     private features: any[];
@@ -25,8 +24,7 @@ export default class OlMap {
 
     constructor(options: any) {
         this.option=options
-        this.map=options.map
-        this.mapView=options.mapView
+        this.olMap=options.map
         this.layerType=options.layerType
         this.layerIndex=options.layerIndex?options.layerIndex:1
         
@@ -35,13 +33,11 @@ export default class OlMap {
         this.drawStyle = {
             lineWidth: options && options.lineWidth ? options.lineWidth : 3,
         };
-
         this.initSymbol();
-        this.initDrawLayer();
-        // console.log(this.drawLayer);
     }
 
     initDrawLayer() {
+        this.clear()
         this.drawSource = new sourceVector({ wrapX: false });
         this.drawLayer = new layerVector({
             source: this.drawSource,
@@ -49,7 +45,7 @@ export default class OlMap {
             style: this.styleSymbol,
 			properties:{layerType:this.layerType}
         });
-        this.map.addLayer(this.drawLayer);
+        this.olMap.getMap().addLayer(this.drawLayer);
     }
 
     initSymbol() {
@@ -113,11 +109,11 @@ export default class OlMap {
             geometryFunction: geometryFunction,
         })
 
-        this.map.addInteraction(this.draw)
-        this.map.getViewport().style.cursor='crosshair'
+        this.olMap.getMap().addInteraction(this.draw)
+        this.olMap.getMap().getViewport().style.cursor='crosshair'
         this.draw.on('drawend', (evt:any) => {
             this.features.push(evt.feature);
-            this.map.getViewport().style.cursor='default'
+            this.olMap.getMap().getViewport().style.cursor='default'
             this.removeInteraction()
             this.draw=null
             if (obj.drawEnd) {
@@ -126,6 +122,7 @@ export default class OlMap {
         })
     }
     drawMultiPoly(coordinates:any,id:any){
+        this.initDrawLayer();
         let poly = this.createGraphic(new MultiPolygon(coordinates),this.polySymbol);
          poly.getGeometry().id=id
         return poly
@@ -141,61 +138,23 @@ export default class OlMap {
     }
 
     removeInteraction() {
-        this.map.getViewport().style.cursor='default'
+        this.olMap.getMap().getViewport().style.cursor='default'
         if(this.draw)
-            this.map.removeInteraction(this.draw)
+            this.olMap.getMap().removeInteraction(this.draw)
     }
 
     finishDraw(){
-        this.map.getViewport().style.cursor='default'
+        this.olMap.getMap().getViewport().style.cursor='default'
         if(this.draw){
             this.draw.finishDrawing()
         }
     }
-    clearDraw(){
-        this.map.getViewport().style.cursor='default'
-        this.finishDraw()
-        this.removeInteraction()
-        this.map.removeLayer(this.drawLayer)
-        this.drawLayer=null
-        this.draw=null
-    }
     clear() {
-        for (let i in this.features) {
-            this.drawSource.removeFeature(this.features[i]);
+        if(this.drawLayer){
+            this.olMap.getMap().removeLayer(this.drawLayer)
+            this.drawLayer = null
         }
         this.features = [];
     }
-    getFeatureById(id:any){
-		if(id){
-             const feature = this.features.find(function (item) {
-                return item.getGeometry().id == id;
-            });
-            return feature;
-        }
-	}
-    rmoveFeatureById(id:any){
-        if(id){
-            const feature = this.features.find(function (item) {
-                return item.getGeometry().id == id;
-            });
-            if(feature){
-                this.drawSource.removeFeature(feature);
-                this.features = this.features.filter(function (item) {
-                    return item.getGeometry().id != id;
-                });
-            }
-            
-        }
-    }
-	clearAll(){
-		var layers = this.map.getLayers().getArray();
-		layers.forEach((layer :any) => {
-			var layerType = layer.get('layerType');
-			if(layerType == this.layerType){
-				this.map.removeLayer(layer);
-			}
-		});
-	}
 
 }

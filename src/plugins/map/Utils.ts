@@ -21,8 +21,8 @@ export const checkTdtKeyTip = async () => {
     return true
 };
 
-export const isTdt = (layerId: string) =>{
-  return layerId.includes('tdt')
+export const isTdt = (mapType: string) =>{
+  return mapType == 'tdt'
 }
 
 // 经纬度转瓦片行列号
