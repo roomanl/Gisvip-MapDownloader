@@ -1,9 +1,2 @@
-{
-"label": "splashscreen",
-"url": "/splashscreen",
-"width": 1000,
-"height": 600,
-"center": true,
-"decorations": false,
-"backgroundColor": "#545c64"
-},
+# 开发中...
+## 使用Tauri2.0+Vue3+Element-Plus+Vite开发的地图下载工具

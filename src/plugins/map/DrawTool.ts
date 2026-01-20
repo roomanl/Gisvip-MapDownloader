@@ -34,51 +34,40 @@ export default class OlMap {
             lineWidth: options && options.lineWidth ? options.lineWidth : 3,
         };
         this.initSymbol();
+       
     }
 
     initDrawLayer() {
-        this.clear()
-        this.drawSource = new sourceVector({ wrapX: false });
-        this.drawLayer = new layerVector({
-            source: this.drawSource,
-            zIndex: this.layerIndex,
-            style: this.styleSymbol,
-			properties:{layerType:this.layerType}
-        });
-        this.olMap.getMap().addLayer(this.drawLayer);
+        if(!this.drawLayer){
+            this.drawSource = new sourceVector({ wrapX: false });
+            this.drawLayer = new layerVector({
+                source: this.drawSource,
+                zIndex: this.layerIndex,
+                style: this.styleSymbol,
+                properties:{layerType:this.layerType}
+            });
+            this.olMap.getMap().addLayer(this.drawLayer);
+       }
     }
 
     initSymbol() {
-        this.setPolySymbol();
-        this.setStyleSymbol();
-    }
-    setStyleSymbol(color?:any,fill?:any,lineWidth?:any,radius?:any) {
         this.styleSymbol =new olStyle({
             image: new olCircle({
-                radius: radius?radius:4,
+                radius:4,
                 stroke: new olStroke({
-                  color: color?color:[246, 0, 60, 1],
-                  width: lineWidth?lineWidth:this.drawStyle.lineWidth,
+                  color: [246, 0, 60, 1],
+                  width: this.drawStyle.lineWidth,
                 }),
                 fill: new olFill({
-                  color: fill?fill:"#fff",
+                  color:"#fff",
                 }),
             }),
             fill: new olFill({
-                color: fill?fill:"rgba(247,23,53,0.3)",
+                color:"rgba(247,23,53,0.3)",
             }),
             stroke: new olStroke({
-                width: lineWidth?lineWidth:this.drawStyle.lineWidth,
-                color:color?color:"rgba(247,23,53,1)"
-            })
-        })
-    }
-    setPolySymbol(color?:any,fillColor?:any,lineWidth?:any) {
-        this.polySymbol =new olStyle({
-            fill: new olFill({ color: fillColor?fillColor:"rgba(247,23,53,0.2)" }),
-            stroke: new olStroke({
-                width: lineWidth?lineWidth:this.drawStyle.lineWidth,
-                color:color?color:"rgba(247,23,53,1)"
+                width: this.drawStyle.lineWidth,
+                color:"rgba(247,23,53,1)"
             })
         })
     }
@@ -87,10 +76,9 @@ export default class OlMap {
         if(obj.lineWidth){
             this.drawStyle.lineWidth=obj.lineWidth
         }
-        this.initSymbol();
-        this.initDrawLayer();
         this.finishDraw()
         this.removeInteraction()
+        this.initDrawLayer();
 
         var drawType = obj.type
         var geometryFunction, maxPoints
@@ -123,7 +111,7 @@ export default class OlMap {
     }
     drawMultiPoly(coordinates:any,id:any){
         this.initDrawLayer();
-        let poly = this.createGraphic(new MultiPolygon(coordinates),this.polySymbol);
+        let poly = this.createGraphic(new MultiPolygon(coordinates),this.styleSymbol);
          poly.getGeometry().id=id
         return poly
       }
@@ -150,9 +138,8 @@ export default class OlMap {
         }
     }
     clear() {
-        if(this.drawLayer){
-            this.olMap.getMap().removeLayer(this.drawLayer)
-            this.drawLayer = null
+         for (let i in this.features) {
+            this.drawSource.removeFeature(this.features[i]);
         }
         this.features = [];
     }
