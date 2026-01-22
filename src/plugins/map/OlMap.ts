@@ -8,9 +8,11 @@ import OverviewMap from 'ol/control/OverviewMap';
 import MousePosition from 'ol/control/MousePosition';
 import {getArea} from 'ol/sphere';
 import Stroke from 'ol/style/Stroke'
-import {getTopLeft, getWidth,getCenter} from 'ol/extent.js'
-import {get as getProjection,transform} from 'ol/proj.js';
+import {getTopLeft, getWidth,getCenter} from 'ol/extent'
+import {get as getProjection,addProjection,addCoordinateTransforms} from 'ol/proj';
 import { getTdtKey } from '@/plugins/store/Setting'
+import { gcj02ToMercator } from '@/plugins/map/TransformUtils'
+import { gcj02Mecator,smerc2gmerc,gmerc2smerc,gmerc2ll,ll2gmerc } from '@/plugins/map/Gcj02MecatorProjection'
 import { isTdt } from '@/plugins/map/Utils'
 
 
@@ -25,7 +27,7 @@ export default class OlMap {
     private overviewMap: OverviewMap;
     private mousePosition:MousePosition;
     private baseProjection = 'EPSG:3857';
-    private baseCenter: any = [116.405285, 39.904989]
+    private baseCenter: any = gcj02ToMercator([116.405285, 39.904989])
 
     constructor(options: any) {
         this.opacity = 1;
@@ -45,14 +47,19 @@ export default class OlMap {
             target: mapTarget,
             view: this.mapView
         })
+        this.initgcj02Mecator()
         this.initControl()
         this.initGraticule()
-        const center=this.transform4326To3857(this.baseCenter)
-        this.setCenter(center)
+        this.setCenter(this.baseCenter)
         this.setZoom(10)
     }
     initControl(){
         this.map.addControl(new ScaleLine())
+    }
+    initgcj02Mecator(){
+        addProjection(gcj02Mecator);
+        addCoordinateTransforms('EPSG:4326', gcj02Mecator, ll2gmerc, gmerc2ll);
+        addCoordinateTransforms('EPSG:3857', gcj02Mecator, smerc2gmerc, gmerc2smerc);
     }
     addOverviewMap(layer: any){
         if(this.overviewMap){
@@ -96,12 +103,11 @@ export default class OlMap {
 
     async loadBaseMap(layer: any){
         // console.log(layer)
-        this.map.getLayers().clear();
+        this.clearLayer()
         this.baseMapLayer=await this.getLayer(layer)
         if(layer.labelLayer){
             this.labelLayer=await this.getLayer(layer.labelLayer)
         }
-        // console.log(this.map)
         var layersArray = this.map.getLayers();
         layersArray.insertAt(0,this.baseMapLayer);
         if(this.labelLayer){
@@ -114,8 +120,8 @@ export default class OlMap {
 
     async getLayer(layer: any){
         let baseMapLayer=null
+        let mapUrl = layer.url
         if(layer.layerType=='tiles'){
-            let mapUrl = layer.url
             if(isTdt(layer.mapType)){
                 mapUrl= mapUrl + (await getTdtKey())
             }
@@ -132,6 +138,17 @@ export default class OlMap {
         return baseMapLayer
     }
 
+    clearLayer(){
+        if(this.baseMapLayer){
+            this.map.removeLayer(this.baseMapLayer)
+            this.baseMapLayer=null
+        }
+        if(this.labelLayer){
+            this.map.removeLayer(this.labelLayer)
+            this.labelLayer =null
+        }
+    }
+
     getArea(polygon: any){
         return getArea(polygon,{projection:this.getMapView().getProjection()})
         
@@ -145,17 +162,6 @@ export default class OlMap {
             output = Math.round(area * 100) / 100 + ' ' + '平方米';
         }
         return output;
-    }
-    transform4326To3857(coordinates: any){
-        return this.transformCoordinates(coordinates,'EPSG:4326','EPSG:3857')
-    }
-    transform3857To4326(coordinates: any){
-        return this.transformCoordinates(coordinates,'EPSG:3857','EPSG:4326')
-    }
-
-    transformCoordinates(coordinates: any,source: any,destination:any){
-        // console.log(coordinates,source,destination)
-        return transform(coordinates,source,destination)
     }
     setCenter(center: any){
         center[0]=parseFloat(center[0])

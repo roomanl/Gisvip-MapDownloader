@@ -214,11 +214,21 @@ export default class DownloadTiles {
   private async getTileUrl(x:any, y:any, z:any){
     const downLayer = JSON.parse(this.taskInfo.downLayer);
     let url = downLayer.url.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+    if(this.hasPlaceholders(url)){
+      url = url.replace(/\{\d+-\d+\}/, (match: string) => {
+        const start = parseInt(match.slice(1, -1).split('-')[0]);
+        const end = parseInt(match.slice(1, -1).split('-')[1]);
+        return this.randomNum(start, end).toString();
+      });
+    }
     if(isTdt(downLayer.mapType)){
-      url=url.replace('{0-7}', this.randomNum(0,7))
       url=url+ (await getTdtKey())
     }
     return url
+  }
+
+  private hasPlaceholders(url: string) {
+    return /\{\d+-\d+\}/.test(url);
   }
   private randomNum(max:number,min:number){ 
     return Math.floor(Math.random() * (max - min + 1)) + min;
