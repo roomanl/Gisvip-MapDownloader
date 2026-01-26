@@ -63,7 +63,7 @@ export class RandomUserAgent {
     'Nova 9', 'Nova 9 Pro', 'Nova 10', 'Nova 10 Pro', 'Nova 11', 'Nova 11 Pro', 'Nova 11 Ultra',
     'Nova 12', 'Nova 12 Pro', 'Nova 12 Ultra', 'Nova 13', 'Nova 13 Pro', 'Nova 13 Ultra',
     // 华为 畅享 系列
-    '畅享 50', '畅享 50 Pro', '畅享 60', '畅享 60 Pro', '畅享 70', '畅享 70 Pro',
+    'changxiang 50', 'changxiang 50 Pro', 'changxiang 60', 'changxiang 60 Pro', 'changxiang 70', 'changxiang 70 Pro',
     // 小米 数字系列
     'Mi 11', 'Mi 11 Pro', 'Mi 11 Ultra', 'Mi 11 Lite',
     'Mi 12', 'Mi 12 Pro', 'Mi 12 Ultra', 'Mi 12 Lite', 'Mi 12S', 'Mi 12S Pro', 'Mi 12S Ultra',

@@ -127,7 +127,7 @@ export default class OlMap {
             }
             baseMapLayer=new TileLayer({
                 source: new SourceXYZ({
-                    projection: layer.prejection,
+                    projection: layer.projection,
                     attributionsCollapsible:false,
                     crossOrigin: 'anonymous',
                     url: mapUrl,

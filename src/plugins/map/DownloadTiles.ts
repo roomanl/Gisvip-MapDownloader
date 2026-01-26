@@ -23,10 +23,20 @@ export default class DownloadTiles {
   private status:TaskStatus = 'pending';
   private isStop: boolean = false;
   private taskInfo: any;
+  private downLayer: any;
+  private downUrl:string;
   private successCallback: Function;
   private failCallback: Function;
   constructor(taskInfo: any) {
     this.taskInfo = taskInfo;
+    this.init();
+  }
+  async init() { 
+    this.downLayer = JSON.parse(this.taskInfo.downLayer);
+    this.downUrl = this.downLayer.url;
+    if(isTdt(this.downLayer.mapType)){
+      this.downUrl += (await getTdtKey())
+    }
   }
   async start(){
     this.setStatus('downloading');
@@ -39,7 +49,6 @@ export default class DownloadTiles {
       const bottomRight = longlat2tile(maxLng, minLat, zoom);
       for (let x = topLeft.x; x <= bottomRight.x; x++) {
         for (let y = topLeft.y; y <= bottomRight.y; y++) {
-          // const downUrl ='https://blog.gisvip.cn/data/image/2025/12/29/34674_stle_6580.png'
           // const downUrl ='http://192.168.1.201/001.jpg'
           const downUrl =await this.getTileUrl( x, y, zoom );
           const {saveDir,filename,savePath} = await this.getSaveDirAndFileName( x, y, zoom );
@@ -89,12 +98,13 @@ export default class DownloadTiles {
     this.activeDownloads.add(taskId);
     task.status = 'downloading';
     this.setStatus('downloading');
+    const ua = RandomUserAgent.generate()
     try {
       // 确保保存目录存在
       if (!await exists(task.saveDir)) {
         await mkdir(task.saveDir, { recursive: true });
       }
-      const ua = RandomUserAgent.generate()
+      
       // 发送HTTP请求
       const response = await fetch(task.url, {
         method: 'GET',
@@ -110,7 +120,7 @@ export default class DownloadTiles {
       }
     } catch (error: any) {
       this.tasKError(taskId)
-      console.error(error);
+      console.error(ua);
     } finally {
       this.activeDownloads.delete(taskId);
       this.processQueue();
@@ -164,7 +174,10 @@ export default class DownloadTiles {
           this.finishAllTask();
         }
       }
-      sqliteManager.updateDownloadSuccessTotal(this.taskInfo.id,this.taskInfo.successTotal)
+      // 为了不频繁操作数据库，每2%更新一次数据库
+      if(this.taskInfo.percentage % 2 === 0){
+        sqliteManager.updateDownloadSuccessTotal(this.taskInfo.id,this.taskInfo.successTotal)
+      }
    }
 
    private retryFailedTask(){
@@ -212,24 +225,15 @@ export default class DownloadTiles {
     return {saveDir,filename,savePath:await join(saveDir, filename)};
   }
   private async getTileUrl(x:any, y:any, z:any){
-    const downLayer = JSON.parse(this.taskInfo.downLayer);
-    let url = downLayer.url.replace('{z}', z).replace('{x}', x).replace('{y}', y);
-    if(this.hasPlaceholders(url)){
-      url = url.replace(/\{\d+-\d+\}/, (match: string) => {
-        const start = parseInt(match.slice(1, -1).split('-')[0]);
-        const end = parseInt(match.slice(1, -1).split('-')[1]);
-        return this.randomNum(start, end).toString();
-      });
-    }
-    if(isTdt(downLayer.mapType)){
-      url=url+ (await getTdtKey())
+    let url = this.downUrl.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+    if(this.downLayer.subdomain && this.downLayer.subdomain.length>0){
+      const subdomains = this.downLayer.subdomain[this.randomNum(0, this.downLayer.subdomain.length - 1)];
+      url = url.replace(/\{\d+-\d+\}/, subdomains);
     }
     return url
   }
 
-  private hasPlaceholders(url: string) {
-    return /\{\d+-\d+\}/.test(url);
-  }
+
   private randomNum(max:number,min:number){ 
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
