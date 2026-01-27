@@ -1,7 +1,7 @@
 <template>
     <div class="zoomslider">
         <el-button circle class="zoom-text">{{ zoom }}</el-button>
-        <el-slider v-model="zoom" :min="1" max="19" vertical height="200px" @input="zoomChange" />
+        <el-slider v-model="zoom" :min="1" :max="18" vertical height="200px" @input="zoomChange" />
     </div>
 </template>
 

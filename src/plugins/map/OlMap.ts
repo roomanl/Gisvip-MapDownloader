@@ -41,7 +41,7 @@ export default class OlMap {
         this.mapView = new View({
             projection: this.baseProjection,
             zoom: 1,
-            maxZoom:19
+            maxZoom:18
         })
         this.map = new Map({
             target: mapTarget,
