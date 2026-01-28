@@ -102,15 +102,12 @@ class DownloadMapManager {
             mapName: this.downConfStore.mapName,
             cityName: this.downConfStore.cityName,
             cityArea: this.downConfStore.cityArea,
+            fullName: this.downConfStore.getFullName(),
             projection: this.downConfStore.projection,
             downExtent: JSON.stringify(this.downConfStore.downExtent),
             downZoom: JSON.stringify(this.downConfStore.downZoom),
             downTilesType: this.downConfStore.downTilesType,
-            downPath: await join(this.downConfStore.downPath,
-                `${this.downConfStore.mapName}-${this.downConfStore.cityName}(${this.downConfStore.projection})`
-                .replaceAll(' ','')
-                .replaceAll('EPSG:','')
-            ),
+            downPath: await join(this.downConfStore.downPath,this.downConfStore.getFullName() ),
             downUrl: this.downConfStore.downLayer.layer.url,
             downLayer: JSON.stringify(this.downConfStore.downLayer.layer),
             tileTotal: this.downConfStore.tileTotal,

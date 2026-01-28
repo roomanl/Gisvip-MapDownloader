@@ -2,7 +2,7 @@
     <div :class="{'task-item':true, 'task-item-bg':props.task.id===downTaskStore.selectTask.id}"
         @click="downTaskStore.selectTask = props.task">
         <div>
-            <el-text line-clamp="2">{{ props.task.mapName }} - {{ props.task.cityName }}({{ props.task.projection.replaceAll('EPSG:','') }})</el-text>
+            <el-text line-clamp="2">{{ props.task.fullName }}</el-text>
         </div>
         <div>
             <el-text type="info" size="small">{{ props.task.createTime }}</el-text>

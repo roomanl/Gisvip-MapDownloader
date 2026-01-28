@@ -19,6 +19,7 @@ class SQLiteManager {
                 mapName TEXT NOT NULL,
                 cityName TEXT NOT NULL,
                 cityArea TEXT NOT NULL,
+                fullName TEXT NOT NULL,
                 projection TEXT NOT NULL,
                 downExtent TEXT NOT NULL,
                 downZoom TEXT NOT NULL,
@@ -39,6 +40,7 @@ class SQLiteManager {
                 mapName,
                 cityName,
                 cityArea,
+                fullName,
                 projection,
                 downExtent,
                 downZoom,
@@ -48,8 +50,8 @@ class SQLiteManager {
                 downLayer,
                 tileTotal,
                 createTime
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) `,
-            [task.mapName,task.cityName,task.cityArea,task.projection,task.downExtent, task.downZoom, task.downTilesType, task.downPath, task.downUrl, task.downLayer, task.tileTotal, task.createTime]
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) `,
+            [task.mapName,task.cityName,task.cityArea,task.fullName,task.projection,task.downExtent, task.downZoom, task.downTilesType, task.downPath, task.downUrl, task.downLayer, task.tileTotal, task.createTime]
         );
         return result;
     }
