@@ -10,10 +10,8 @@
         </Teleport>
         <div>
             <el-tabs v-model="activeName">
-                <el-tab-pane :name="0">
-                    <MapKeySetting />
-                </el-tab-pane>
-                <el-tab-pane :name="1">Config</el-tab-pane>
+                <el-tab-pane :name="0"><MapKeySetting /></el-tab-pane>
+                <el-tab-pane :name="1"><DownSetting /></el-tab-pane>
             </el-tabs>
             
         </div>
@@ -25,6 +23,7 @@
     import { useAppStore } from '@/store/modules/app'
     import LeftPanel from './components/LeftPanel.vue';
     import MapKeySetting from './components/MapKeySetting'
+    import DownSetting from './components/DownSetting'
 
     const appStore = useAppStore()
     const titleText = ref('')

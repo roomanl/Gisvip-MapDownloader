@@ -55,6 +55,7 @@ class DownloadMapManager {
         let downloadTask = this.downloadTasks.get(taskInfo.id)
         if(!downloadTask){
             downloadTask = new DownloadTiles(taskInfo)
+            await downloadTask.init()
             downloadTask.setCallback(
                 (taskId: any)=>this.downloadTilesSuccess(taskId),
                 (taskId: any)=>this.downloadTilesError(taskId)
@@ -152,7 +153,7 @@ class DownloadMapManager {
             case 'pending':
                 return type=='text'?'等待下载':(type=='color'?'#909399':'icon')
             case 'downloading':
-                return type=='text'?'下载中':(type=='color'?'#409EFF':'icon')
+                return type=='text'?'下载中...':(type=='color'?'#409EFF':'icon')
             case 'paused':
                 return type=='text'?'暂停下载':(type=='color'?'#E6A23C':'icon')
             case 'completed':

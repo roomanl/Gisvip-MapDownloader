@@ -10,7 +10,7 @@ class SQLiteManager {
         if(!this.db){
             this.db = await Database.load('sqlite:gisvipmap.db');
             await this.initTable();
-            }
+        }
     }
     async initTable() {
         await this.db.execute(`
