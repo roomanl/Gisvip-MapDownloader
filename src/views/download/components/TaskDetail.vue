@@ -54,20 +54,23 @@
                 v-if="['pending','paused','error'].includes(downTaskStore.selectTask.taskStatus)" 
                 type="primary" @click="startTask">开始下载</el-button>
             <el-button v-if="downTaskStore.selectTask.taskStatus=='downloading'" type="warning" @click="stopDownload">暂停下载</el-button>
-            <el-button v-if="downTaskStore.selectTask.taskStatus=='completed'" type="info" @click="openFolder">打开所在文件夹</el-button>
+            <el-button v-if="downTaskStore.selectTask.taskStatus=='completed'" type="primary" @click="openFolder">打开所在文件夹</el-button>
+            <el-button v-if="downTaskStore.selectTask.taskStatus=='completed'" type="success" @click="openWindow">离线预览</el-button>
             <el-button v-if="downTaskStore.selectTask.taskStatus!='downloading'" type="danger" @click="deleteTask">删除任务</el-button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { computed } from 'vue';
+    import { computed, onMounted } from 'vue';
     import { openPath } from '@tauri-apps/plugin-opener';
+    import { Window } from "@tauri-apps/api/window"
     import { ElMessageBox,ElNotification } from 'element-plus'
     import { downloadMapManager } from '@/plugins/map/DownloadMapManager'
     import { useDownTaskStore } from '@/store/modules/downTask'
 
     const downTaskStore = useDownTaskStore()
+    const window = new Window('previewTiles')
 
     const taskStatusText = computed(() => {
         return downloadMapManager.getTaskStatusAlis(downTaskStore.selectTask.taskStatus,'text')
@@ -116,6 +119,13 @@
     const openFolder = async () => {
         await openPath(downTaskStore.selectTask.downPath)
     }
+
+    const openWindow = async () => {
+        
+        window.show()
+    }
+    onMounted(() => {
+    })
 
 </script>
 

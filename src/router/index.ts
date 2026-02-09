@@ -3,14 +3,18 @@
  * @return {*}
  */
 import { RouteRecordRaw } from "vue-router";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Layout from '@/layout/index.vue'
 
 export const routes: Array<RouteRecordRaw> = [
-  {
+    {
       path: '/',
       component: () => import('@/views/welcome/index.vue'),
       name: 'Welcome'
+    },{
+      path: '/previewTiles',
+      component: () => import('@/views/previewTiles/index.vue'),
+      name: 'PreviewTiles'
     },{
     path: '/main',
     component: Layout,
@@ -37,7 +41,7 @@ export const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 

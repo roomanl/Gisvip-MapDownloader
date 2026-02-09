@@ -21,6 +21,16 @@
         "center": true,
         "decorations": false,
         "visible": false
+      },{
+        "title": "瓦片预览",
+        "label": "previewTiles",
+        "url": "previewTiles",
+        "width": 1100,
+        "height": 700,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "center": true,
+        "visible": false
       }
     ],
     "security": {

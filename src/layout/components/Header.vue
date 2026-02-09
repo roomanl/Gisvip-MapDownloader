@@ -3,7 +3,7 @@
         <div class="right-container">
             <el-button text plain icon="SemiSelect" @click="minimize" />
             <el-button text plain icon="FullScreen" @click="toggleMaximize" />
-            <el-button text plain icon="CloseBold" @click="close" />
+            <el-button text plain icon="CloseBold" @click.stop="close" />
         </div>
     </div>
     <div class="top-title" id="layout-toptitle-subpanel">
@@ -40,6 +40,7 @@ const toggleMaximize = async () => {
     }
 }
 const close = async () => {
+  console.log('close')
    ElMessageBox.confirm(
     '确定要关闭应用吗？',
     '提示',
