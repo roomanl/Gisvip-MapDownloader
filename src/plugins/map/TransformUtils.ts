@@ -1,4 +1,6 @@
 import coordtransform from 'coordtransform';
+import { baiduMercator } from 'projzh/projection/index';
+import { bd09 } from 'projzh/datum/index';
 import {transform as olTransform} from 'ol/proj.js';
 
 export const gcj02ToWgs84 = (coordinate: any) => {
@@ -8,6 +10,9 @@ export const gcj02ToWgs84 = (coordinate: any) => {
 export const gcj02ToMercator = (coordinate: any) => {
     const wgs84 = gcj02ToWgs84(coordinate);
     return olTransform(wgs84, 'EPSG:4326','EPSG:3857');
+};
+export const wgs84ToBaiduMercator = (coordinate: any) => {
+    return baiduMercator.forward(bd09.fromWGS84(coordinate));
 };
 
 export const gcj02ToMercatorMultiPolygon = (coordinates: any) => {

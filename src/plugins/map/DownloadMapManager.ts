@@ -5,7 +5,7 @@ import { useDownTaskStore } from '@/store/modules/downTask'
 import { useAppStore } from '@/store/modules/app'
 import { formatDate } from '@/utils/index'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
-import { isTdt,checkTdtKeyTip } from '@/plugins/map/Utils'
+import { isTdt,checkTdtKeyTip,calculateTileCount,calculateBdTileCount,longlat2tile,longlat2bdtile } from '@/plugins/map/Utils'
 import DownloadTiles from '@/plugins/map/DownloadTiles'
 
 class DownloadMapManager {
@@ -54,7 +54,10 @@ class DownloadMapManager {
         }
         let downloadTask = this.downloadTasks.get(taskInfo.id)
         if(!downloadTask){
-            downloadTask = new DownloadTiles(taskInfo)
+            downloadTask = new DownloadTiles({
+                taskInfo,
+                longlat2tile:this.getLonglat2tile(taskInfo.projection),
+            })
             await downloadTask.init()
             downloadTask.setCallback(
                 (taskId: any)=>this.downloadTilesSuccess(taskId),
@@ -163,6 +166,20 @@ class DownloadMapManager {
             default:
                 return type=='text'?'等待下载':(type=='color'?'#E6A23C':'icon')
         }
+    }
+
+    getTileCount(extent: number[], zooms: number[],epsg:string){
+        if(epsg=='DB09-MC'){
+            return calculateBdTileCount(extent, zooms)
+        }
+        return calculateTileCount(extent, zooms)
+
+    }
+    getLonglat2tile(epsg:string){
+        if(epsg=='DB09-MC'){
+            return longlat2bdtile
+        }
+        return longlat2tile
     }
     notification(message: string,type?: string){
         ElNotification({

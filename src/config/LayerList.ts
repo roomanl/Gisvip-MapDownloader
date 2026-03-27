@@ -36,7 +36,7 @@ export const layerList =[
         url:'https://webst0{1-4}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
         labelLayer:{
             label: '卫星地图注记',
-            id: 'amap-terrain-label',
+            id: 'amap-satellite-label',
             mapType: 'amap',
             layerType: 'tiles',
             projection: 'GCJ-02',
@@ -54,6 +54,46 @@ export const layerList =[
         url:'https://webrd0{1-4}.is.autonavi.com/appmaptile?lang=en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
       },
     ],
+  },
+  {
+    label: '百度地图',
+    id: 'bdmap',
+    children: [
+      {
+        label: '电子地图',
+        id: 'bdmap-normal',
+        mapType: 'bdmap',
+        layerType: 'bdtiles',
+        projection: 'DB09-MC',
+        subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&v=009&scaler=1&p=1&udt=20260108',
+      },{
+        label: '电子地图(精简)',
+        id: 'bdmap-normal-lite',
+        mapType: 'bdmap',
+        layerType: 'bdtiles',
+        projection: 'DB09-MC',
+        subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=vtile&x={x}&y={y}&z={z}&styles=pl&v=009&scaler=1&p=1&udt=20260108&styleId=1',
+      },{
+        label: '卫星地图',
+        id: 'bdmap-satellite',
+        mapType: 'bdmap',
+        layerType: 'bdtiles',
+        projection: 'DB09-MC',
+        subdomain: [0, 1, 2, 3],
+        url:'http://maponline{0-3}.bdimg.com/starpic/?qt=satepc&u=x={x};y={y};z={z};v=009;type=sate&styles=sl&v=009&scaler=1&p=1&udt=20260108',
+        labelLayer:{
+          label: '卫星地图注记',
+          id: 'bdmap-satellite-label',
+          mapType: 'bdmap',
+          layerType: 'bdtiles',
+          projection: 'DB09-MC',
+          subdomain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          url:'http://online{0-9}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=sl&v=009&scaler=1&p=1&udt=20260108',
+        }
+      }
+    ]
   },
   {
     label: '天地图',

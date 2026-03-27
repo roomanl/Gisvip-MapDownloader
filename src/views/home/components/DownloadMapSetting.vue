@@ -58,7 +58,7 @@
     import { open as openDirDialog } from '@tauri-apps/plugin-dialog';
     import { getDownloadPath ,setDownloadPath } from '@/plugins/store/Setting'
     import { downloadMapManager } from '@/plugins/map/DownloadMapManager'
-    import { calculateTileCount } from '@/plugins/map/Utils'
+    import { calculateTileCount,calculateBdTileCount } from '@/plugins/map/Utils'
     import { useDownConfStore } from '@/store/modules/downConf'
 
     const downConfStore = useDownConfStore()
@@ -80,14 +80,14 @@
     }
 
     const tileTotalChange = () => {
-        downConfStore.tileTotal = calculateTileCount(downConfStore.downExtent,downConfStore.downZoom)
+        downConfStore.tileTotal = downloadMapManager.getTileCount(downConfStore.downExtent,downConfStore.downZoom,downConfStore.projection)
     }
 
     const init = async () => {
         downConfStore.downPath = await getDownloadPath()
     }
 
-    watch(() => downConfStore.downExtent,()=>{
+    watch(() => [downConfStore.downExtent,downConfStore.downLayer],()=>{
         tileTotalChange()
     })
     onMounted(() => {

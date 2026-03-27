@@ -9,6 +9,7 @@ import { isTdt,longlat2tile } from '@/plugins/map/Utils'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 import { getPercentage } from '@/utils/index'
 import { RandomUserAgent } from '@/utils/userAgent';
+import { F } from 'vue-router/dist/router-CWoNjPRp.mjs';
 
 type TaskStatus = 'pending' | 'downloading' | 'paused' | 'completed' | 'error' | 'cancelled';
 
@@ -27,8 +28,10 @@ export default class DownloadTiles {
   private downUrl:string;
   private successCallback: Function;
   private failCallback: Function;
-  constructor(taskInfo: any) {
-    this.taskInfo = taskInfo;
+  private longlat2tile:Function;
+  constructor(options: any) {
+    this.taskInfo = options.taskInfo;
+    this.longlat2tile = options.longlat2tile
   }
   async init() { 
     this.concurrentLimit = await getDownloadLimit();
@@ -45,10 +48,14 @@ export default class DownloadTiles {
     const extent = JSON.parse(this.taskInfo.downExtent);
     const [minLng, minLat, maxLng, maxLat] = extent;
     for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
-      const topLeft = longlat2tile(minLng, maxLat, zoom);
-      const bottomRight = longlat2tile(maxLng, minLat, zoom);
-      for (let x = topLeft.x; x <= bottomRight.x; x++) {
-        for (let y = topLeft.y; y <= bottomRight.y; y++) {
+      const topLeft = this.longlat2tile(minLng, maxLat, zoom);
+      const bottomRight = this.longlat2tile(maxLng, minLat, zoom);
+      const startX = Math.min(topLeft.x, bottomRight.x);
+      const endX = Math.max(topLeft.x, bottomRight.x);
+      const startY = Math.min(topLeft.y, bottomRight.y);
+      const endY = Math.max(topLeft.y, bottomRight.y);
+      for (let x = startX; x <= endX; x++) {
+        for (let y = startY; y <= endY; y++) {
           // const downUrl ='http://192.168.1.201/001.jpg'
           const downUrl =await this.getTileUrl( x, y, zoom );
           const {saveDir,filename,savePath} = await this.getSaveDirAndFileName( x, y, zoom );
