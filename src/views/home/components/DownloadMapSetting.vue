@@ -45,6 +45,9 @@
                     <el-option label="png" value="png"/>
                 </el-select> -->
             </el-form-item>
+            <el-form-item v-if="downConfStore.downLayer?.layer.labelLayer" label="同时下载注记" label-position="left">
+                <el-checkbox label="" v-model="downConfStore.downLabel" />
+            </el-form-item>
             <el-form-item label="下载路径">
                 <el-input v-model="downConfStore.downPath" readonly @click="selectPath" />
             </el-form-item>

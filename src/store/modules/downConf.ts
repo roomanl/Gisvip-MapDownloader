@@ -12,6 +12,7 @@ export const useDownConfStore = defineStore('downConf-store', () => {
     const downArea = ref(undefined)
     const tileTotal = ref(0)
     const projection = ref('')
+    const downLabel = ref(false)
 
     const mapName = computed(()=>{
         if(!downLayer.value){
@@ -44,6 +45,20 @@ export const useDownConfStore = defineStore('downConf-store', () => {
                 .replaceAll(' ','')
                 .replaceAll('EPSG:','')
     }
+    const getLabelMapName = ()=>{
+        if(!downLayer.value){
+            return '未选择地图'
+        }
+        return downLayer.value.parent.label+' - '+ downLayer.value.layer.labelLayer.label
+    }
+    const getLabelFullName = ()=>{
+        if(!downLayer.value){
+            return '未选择地图'
+        }
+        return `${getLabelMapName()}-${cityName.value}(${projection.value})`
+                .replaceAll(' ','')
+                .replaceAll('EPSG:','')
+    }
   
     return {
         downExtent,
@@ -58,6 +73,9 @@ export const useDownConfStore = defineStore('downConf-store', () => {
         cityArea,
         tileTotal,
         projection,
-        getFullName
+        downLabel,
+        getFullName,
+        getLabelMapName,
+        getLabelFullName
     };
 });

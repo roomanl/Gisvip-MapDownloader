@@ -14,7 +14,8 @@ import { getTdtKey } from '@/plugins/store/Setting'
 import { gcj02ToMercator } from '@/plugins/map/TransformUtils'
 import { gcj02Mecator,smerc2gmerc,gmerc2smerc,gmerc2ll,ll2gmerc } from '@/plugins/map/Gcj02MecatorProjection'
 import { bd09Mecator,smerc2bmerc,bmerc2smerc,bmerc2ll,ll2bmerc } from '@/plugins/map/BD09MCProjection'
-import BaiDuLayer from '@/plugins/map/BaiDuLayer'
+import BaiDuTileLayer from '@/plugins/map/layer/BaiDuTileLayer'
+import TencentTileLayer from '@/plugins/map/layer/TencentTileLayer'
 import { isTdt } from '@/plugins/map/Utils'
 
 
@@ -104,20 +105,20 @@ export default class OlMap {
         if(this.gridLayer)
             this.map.removeLayer(this.gridLayer)
     }
-
     async loadBaseMap(layer: any){
         // console.log(layer)
+        const layerInfo = JSON.parse(JSON.stringify(layer))
         this.clearLayer()
-        this.baseMapLayer=await this.getLayer(layer)
-        if(layer.labelLayer){
-            this.labelLayer=await this.getLayer(layer.labelLayer)
+        this.baseMapLayer=await this.getLayer(layerInfo)
+        if(layerInfo.labelLayer){
+            this.labelLayer=await this.getLayer(layerInfo.labelLayer)
         }
         var layersArray = this.map.getLayers();
         layersArray.insertAt(0,this.baseMapLayer);
         if(this.labelLayer){
             layersArray.insertAt(1,this.labelLayer);
         }
-        const overviewMap=await this.getLayer(layer)
+        const overviewMap=await this.getLayer(layerInfo)
         this.addOverviewMap(overviewMap)
         this.updateSize()
     }
@@ -138,7 +139,9 @@ export default class OlMap {
                 }),
             })
         }else if(layer.layerType=='bdtiles'){
-            baseMapLayer=new BaiDuLayer(layer)
+            baseMapLayer=new BaiDuTileLayer(layer)
+        }else if(layer.layerType=='tencenttiles'){ 
+            baseMapLayer=new TencentTileLayer(layer)
         }
         return baseMapLayer
     }

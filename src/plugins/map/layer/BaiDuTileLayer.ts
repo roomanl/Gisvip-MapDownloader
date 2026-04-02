@@ -1,7 +1,7 @@
 import TileLayer from 'ol/layer/Tile'
 import SourceXYZ from 'ol/source/XYZ'
 import TileGrid from 'ol/tilegrid/TileGrid'
-export default class BaiDuLayer extends TileLayer {
+export default class BaiDuTileLayer extends TileLayer {
     constructor(opt_options:any) {
         const options = opt_options ? opt_options : {};
         var bmercResolutions = new Array(19);
@@ -10,6 +10,7 @@ export default class BaiDuLayer extends TileLayer {
         }
         options.source= new SourceXYZ({
             projection: options.projection,
+            crossOrigin: 'anonymous',
             // tilePixelRatio:2,
             tileUrlFunction: function (tileCoord) {
                 var URLS_LENGTH = options.subdomain.length          
@@ -26,7 +27,7 @@ export default class BaiDuLayer extends TileLayer {
                     y = 'M' + (-y)
                 }
               return options.url
-                .replace(/\{\d+-\d+\}/, index).replace('{x}', x).replace('{y}', y).replace('{z}', z)
+                .replace(/\{\d+-\d+\}/, options.subdomain[index]).replace('{x}', x).replace('{y}', y).replace('{z}', z)
             },
             tileGrid: new TileGrid({
               origin:[0,0],
