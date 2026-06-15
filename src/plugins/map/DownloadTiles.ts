@@ -5,11 +5,11 @@ import { join } from '@tauri-apps/api/path';
 import { writeFile, mkdir, exists,remove as removeFile } from "@tauri-apps/plugin-fs";
 import { nanoid } from 'nanoid';
 import { getTdtKey,getDownloadLimit } from '@/plugins/store/Setting'
+import * as downloadInfoStore from '@/plugins/store/DownloadInfo'
 import { isTdt,isTencent } from '@/plugins/map/Utils'
 import { sqliteManager } from '@/plugins/sqlite/SQLiteManager'
 import { getPercentage } from '@/utils/index'
 import { RandomUserAgent } from '@/utils/userAgent';
-import { F } from 'vue-router/dist/router-CWoNjPRp.mjs';
 
 type TaskStatus = 'pending' | 'downloading' | 'paused' | 'completed' | 'error' | 'cancelled';
 
@@ -27,6 +27,11 @@ export default class DownloadTiles {
   private downLayer: any;
   private downUrl:string;
   private isTencentMap:boolean;
+  private downX:any;
+  private downY:any;
+  private downZ:any;
+  private downZxy:any;
+  private downErrorZxy:any = [];
   private successCallback: Function;
   private failCallback: Function;
   private longlat2tile:Function;
@@ -35,39 +40,87 @@ export default class DownloadTiles {
     this.longlat2tile = options.longlat2tile
   }
   async init() { 
-    this.concurrentLimit = await getDownloadLimit();
     this.downLayer = JSON.parse(this.taskInfo.downLayer);
     this.downUrl = this.downLayer.url;
+    //获取设置的下载线程数
+    this.concurrentLimit = await getDownloadLimit();
+    //天地图拼接key
     if(isTdt(this.downLayer.mapType)){
       this.downUrl += (await getTdtKey())
     }
+    //是否是腾讯地图
     this.isTencentMap = isTencent(this.downLayer.mapType);
+    //获取上次下载的zxy
+    const downZxy = await downloadInfoStore.getDownZxy(this.taskInfo.id)
+    this.taskInfo.successTotal = 0
+    if(downZxy){
+      const downZxyArr = downZxy.split(',')
+      if(downZxyArr.length == 4){
+        this.downZ = parseInt(downZxyArr[0])
+        this.downX = parseInt(downZxyArr[1])
+        this.downY = parseInt(downZxyArr[2])
+        this.taskInfo.successTotal =  parseInt(downZxyArr[3])
+      }
+    }
+    //获取上次错误下载的zxy
+    const downErrorZxy = await downloadInfoStore.getDownErrorZxy(this.taskInfo.id)
+    if(downErrorZxy){
+      this.downErrorZxy = JSON.parse(downErrorZxy)
+      this.taskInfo.errorTotal = this.downErrorZxy.length
+    }
   }
   async start(){
     this.setStatus('downloading');
-    this.taskInfo.successTotal = 0;
-    const [minZoom, maxZoom] = JSON.parse(this.taskInfo.downZoom);
-    const extent = JSON.parse(this.taskInfo.downExtent);
-    const [minLng, minLat, maxLng, maxLat] = extent;
-    for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
-      const topLeft = this.longlat2tile(minLng, maxLat, zoom);
-      const bottomRight = this.longlat2tile(maxLng, minLat, zoom);
-      const startX = Math.min(topLeft.x, bottomRight.x);
-      const endX = Math.max(topLeft.x, bottomRight.x);
-      const startY = Math.min(topLeft.y, bottomRight.y);
-      const endY = Math.max(topLeft.y, bottomRight.y);
-      for (let x = startX; x <= endX; x++) {
-        for (let y = startY; y <= endY; y++) {
-          // const downUrl ='http://192.168.1.201/001.jpg'
-          const downUrl =await this.getTileUrl( x, y, zoom );
-          const {saveDir,filename,savePath} = await this.getSaveDirAndFileName( x, y, zoom );
-          this.addTask(downUrl,saveDir,savePath,filename);
-          // console.log(downUrl);
-        }
-      }
+    // this.taskInfo.successTotal = 0;
+    //先开始上次下载失败的
+    await this.startDownErrorZxy()
+    //再下载没下载的
+    const { downZoom, downExtent } = this.taskInfo;
+    const [minZoom, maxZoom] = JSON.parse(downZoom);
+    const [minLng, minLat, maxLng, maxLat] = JSON.parse(downExtent);
+    // 设置起始缩放级别
+    const startZoom = this.downZ || minZoom;
+    this.downZ = undefined;
+    // 批量处理所有缩放级别
+    this.processZoomLevels(startZoom, maxZoom, minLng, maxLat, maxLng, minLat);
+  }
+  async startDownErrorZxy(){
+    if(this.downErrorZxy.length > 0){
+      this.downErrorZxy.forEach(async (zxy:any) => {
+        await this.createSingleTileTask(zxy.x, zxy.y, zxy.z)
+      });
     }
   }
-  async addTask(downUrl:string,saveDir:string,savePath:string,filename:string){
+  async processZoomLevels(startZoom:any, maxZoom:any, minLng:any, maxLat:any, maxLng:any, minLat:any) {
+    for (let zoom = startZoom; zoom <= maxZoom; zoom++) {
+      this.processTilesAtZoom(zoom, minLng, maxLat, maxLng, minLat);
+    }
+  }
+  async processTilesAtZoom(zoom:any, minLng:any, maxLat:any, maxLng:any, minLat:any) {
+      const topLeft = this.longlat2tile(minLng, maxLat, zoom);
+      const bottomRight = this.longlat2tile(maxLng, minLat, zoom);
+      
+      const startX = this.downX || Math.min(topLeft.x, bottomRight.x);
+      const endX = Math.max(topLeft.x, bottomRight.x);
+      const startY = this.downY || Math.min(topLeft.y, bottomRight.y);
+      const endY = Math.max(topLeft.y, bottomRight.y);
+      
+      // 清除断点标记
+      this.clearBreakpointFlags();
+      //循环瓦片
+      for (let x = startX; x <= endX; x++) {
+        for (let y = startY; y <= endY; y++) {
+          await this.createSingleTileTask(x, y, zoom)
+        }
+      }
+  }
+  async createSingleTileTask(x:any, y:any, zoom:any) {
+      const downUrl = await this.getTileUrl(x, y, zoom);
+      // const downUrl ='http://192.168.1.201/001.jpg'
+      const { saveDir, filename, savePath } = await this.getSaveDirAndFileName(x, y, zoom);
+      this.addTask(downUrl, saveDir, savePath, filename,`${zoom},${x},${y}`);
+  }
+  async addTask(downUrl:string,saveDir:string,savePath:string,filename:string,downZxy:any){
     const taskId = nanoid();
     const task = {
       taskId: taskId,
@@ -75,6 +128,7 @@ export default class DownloadTiles {
       filename,
       saveDir,
       savePath,
+      downZxy,
       totalSize: 0,
       downloaded: 0,
       percentage: 0,
@@ -86,6 +140,7 @@ export default class DownloadTiles {
     if (await exists(task.savePath)) {
       task.status = 'completed';
       this.taskInfo.successTotal += 1;
+      this.downZxy = `${task.downZxy},${this.taskInfo.successTotal}`
       this.updateProgress()
     }else if(this.activeDownloads.size < this.concurrentLimit && !this.isStop) {
       this.startDownload(taskId);
@@ -124,17 +179,23 @@ export default class DownloadTiles {
         await writeFile(task.savePath,  await response.bytes());
         task.status = 'completed';
         this.taskInfo.successTotal += 1;
+        this.downZxy = `${task.downZxy},${this.taskInfo.successTotal}`
       }else{
         this.tasKError(taskId)
       }
     } catch (error: any) {
       this.tasKError(taskId)
-      console.error(ua);
+      console.error(error,ua);
     } finally {
       this.activeDownloads.delete(taskId);
       this.processQueue();
       this.updateProgress()
     }
+  }
+
+  clearBreakpointFlags() {
+    if (this.downX) this.downX = undefined;
+    if (this.downY) this.downY = undefined;
   }
 
   pauseDownload() {
@@ -183,9 +244,10 @@ export default class DownloadTiles {
           this.finishAllTask();
         }
       }
-      // 为了不频繁操作数据库，每2%更新一次数据库
-      if(this.taskInfo.percentage % 2 === 0){
+      // 为了不频繁操作数据库，每成功20个瓦片更新一次数据库
+      if(this.taskInfo.successTotal % 20 === 0 || this.taskInfo.percentage>=100){
         sqliteManager.updateDownloadSuccessTotal(this.taskInfo.id,this.taskInfo.successTotal)
+        downloadInfoStore.setDownZxy(this.taskInfo.id,this.downZxy)
       }
    }
 

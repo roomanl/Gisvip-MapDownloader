@@ -25,7 +25,7 @@ export const setDownloadPath = async (path: string) => {
 }
 export const getDownloadLimit = async () => {
   const limit = await store.get(downLimitKey)
-  return limit?limit:1
+  return limit?limit:5
 }
 export const setDownloadLimit = async (limit: number) => {
   await store.set(downLimitKey, limit)
